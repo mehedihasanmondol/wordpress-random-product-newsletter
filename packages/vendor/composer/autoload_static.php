@@ -70,6 +70,7 @@ class ComposerStaticInitb44a9b29498e482bd3c0e20f3341c378
     public static $classMap = array (
         'BaseSendGridClientInterface' => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/BaseSendGridClientInterface.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'DummyUserCategoryRegister' => __DIR__ . '/../..' . '/plugin/DummyUserCategoryRegister.php',
         'Init' => __DIR__ . '/../..' . '/plugin/Init.php',
         'NewsLetterPluginAssistant' => __DIR__ . '/../..' . '/plugin/NewsLetterPluginAssistant.php',
         'NewsLetterPluginConfig' => __DIR__ . '/../..' . '/plugin/NewsLetterPluginConfig.php',

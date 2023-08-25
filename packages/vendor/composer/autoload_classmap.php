@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'BaseSendGridClientInterface' => $vendorDir . '/sendgrid/sendgrid/lib/BaseSendGridClientInterface.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'DummyUserCategoryRegister' => $baseDir . '/plugin/DummyUserCategoryRegister.php',
     'Init' => $baseDir . '/plugin/Init.php',
     'NewsLetterPluginAssistant' => $baseDir . '/plugin/NewsLetterPluginAssistant.php',
     'NewsLetterPluginConfig' => $baseDir . '/plugin/NewsLetterPluginConfig.php',

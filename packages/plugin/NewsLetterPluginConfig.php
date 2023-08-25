@@ -9,6 +9,7 @@
 class NewsLetterPluginConfig
 {
     public $plugin_name = "Random product newsletter";
+    public $plugin_short_name = "Newsletter";
     public $post_type = "product-newsletter";
     public $setup_menu_slug = "newsletter_settings";
     public $label = "Product newsletter";
@@ -16,4 +17,5 @@ class NewsLetterPluginConfig
     public $setup_menu_title = "Newsletter";
     public $send_grid_api_key = "send_grid_api_key_Newsletter";
     public $send_grid_api_option = "send_grid_api_key";
+
 }
