@@ -15,6 +15,8 @@ class Init extends NewsLetterPluginConfig
         $key = get_option($this->send_grid_api_option);
         $this->send_grid_api_key =  $key ? $key : $this->send_grid_api_key;
 
+
+
     }
     function load_newsletter_script(){
         wp_enqueue_script( 'newsletter-plugin',NEWS_LETTER_PLUGIN_DIR_URL."assets/newsletter-plugin.js",['jquery']);
@@ -22,74 +24,143 @@ class Init extends NewsLetterPluginConfig
     function load_jquery_script(){
         wp_enqueue_script( 'jquery-cdn','https://code.jquery.com/jquery-3.7.0.min.js');
     }
-    function custom_text_editor_meta_box_callback($post) {
-        $custom_content = "";
-        if ($post){
-            // Get the current value of the custom field
-            $custom_content = get_post_meta($post->ID, '_custom_content_key', true);
 
-        }
-
+    function custom_text_editor_meta_box_callback($field_name="",$content="") {
         // Output the HTML for the meta box
-        wp_editor($custom_content, 'newsletter_body', array(
-            'textarea_name' => 'newsletter_body', // Name of the textarea field
+        wp_editor($content, 'newsletter_body', array(
+            'textarea_name' => $field_name, // Name of the textarea field
             'media_buttons' => true, // Show media buttons
             'textarea_rows' => 15, // Number of rows in the editor
             'teeny' => true, // Use a minimal editor
         ));
     }
 
+    function save_post_meta($post_id){
+        $config_instance = new NewsLetterPluginConfig();
+        foreach ($config_instance->post_meta_keys as $index => $key){
+            if (isset($_POST[$key])){
+                $value = $_POST[$key];
+                if ($key == $config_instance->post_meta_user_categories){
+                    $value = join(",",$value);
+                }
+
+                $this->update_post_meta($post_id,$key,$value);
+
+            }
+        }
+
+    }
+
+    function update_post_meta($post_id,$key,$value){
+        update_post_meta($post_id, $key, $value);
+    }
+    function get_post_data($post_id){
+        $meta_keys = (new NewsLetterPluginConfig())->post_meta_keys;
+        $data = array(
+        );
+
+        foreach ($meta_keys as $index => $key){
+            $value = get_post_meta($post_id,$key,true);
+            $data[$key] = $value ? $value : "";
+
+            if ($key == (new NewsLetterPluginConfig())->post_meta_api_key){
+                $data[$key] = $data[$key] ? $data[$key] : $this->send_grid_api_key;
+            }
+            if ($key == (new NewsLetterPluginConfig())->post_meta_week_day){
+                $data[$key] = $data[$key] ? $data[$key] : 0;
+            }
+
+        }
+
+
+        return $data;
+    }
+
     function add_custom_fields(){
+
         add_action( 'add_meta_boxes', function (){
-            add_meta_box("newsletter_api_key","SendGrid API key",function (){
-                echo "<input class='regular-text' style='width:100%' type='text' placeholder='SendGrid API key' value='".$this->send_grid_api_key."'/>";
+            $meta_keys = (new NewsLetterPluginConfig())->post_meta_keys;
+
+            $post_id = $_GET['post'] ?? 0;
+            $post_data = $this->get_post_data($post_id);
+
+
+            add_meta_box($meta_keys['api_key'],"SendGrid API key",function () use ($meta_keys,$post_data){
+                echo "<input class='regular-text' value='".$post_data[$meta_keys['api_key']]."' name='".$meta_keys['api_key']."' style='width:100%' type='text' placeholder='SendGrid API key'/>";
             },$this->post_type);
 
-            add_meta_box("newsletter_subject","Subject",function (){
-                echo "<input class='regular-text' style='width:100%' type='text' placeholder='subject'/>";
+            add_meta_box($meta_keys['subject'],"Subject",function () use ($meta_keys,$post_data){
+                echo "<input class='regular-text' value='".$post_data[$meta_keys['subject']]."' name='".$meta_keys['subject']."' style='width:100%' type='text' placeholder='subject'/>";
             },$this->post_type);
 
-            add_meta_box("newsletter_body_content","Body",function (){
-                $this->custom_text_editor_meta_box_callback("");
+            add_meta_box($meta_keys['body'],"Body",function () use ($meta_keys,$post_data){
+                $this->custom_text_editor_meta_box_callback($meta_keys['body'],$post_data[$meta_keys['body']]);
             },$this->post_type);
 
-            add_meta_box("newsletter_user_categories","Send to",function (){
+            add_meta_box($meta_keys['user_categories'],"Send to",function () use ($meta_keys,$post_data){
                 $user_categories_html = "";
                 // Get the global WP_Roles object
                 $roles = wp_roles();
-
                 // Get an array of all the role names
                 $role_names = $roles->get_names();
 
-                // Print the role names
-                foreach ($role_names as $role_name) {
-                    $user_categories_html .= "<div class='inside'>"."<input type='checkbox' name='user_categories' value='".$role_name."'><label>".$role_name."</label></div>";
+                foreach ($role_names as $role_key => $role_name) {
+                    $checked = "";
+                    if (in_array($role_key,explode(",",$post_data[$meta_keys['user_categories']]))){
+                        $checked = "checked";
+                    }
+                    $user_categories_html .= "<div class='inside'>"."<input $checked type='checkbox' name='".$meta_keys['user_categories']."[]' value='".$role_key."'><label>".$role_name."</label></div>";
 
                 }
 
                 echo $user_categories_html;
             },$this->post_type);
 
-            add_meta_box("newsletter_sending_frequency","Frequency of Sending",function (){
+            add_meta_box($meta_keys['sending_frequency'],"Frequency of Sending",function () use ($meta_keys,$post_data){
 
+                $value = $post_data[$meta_keys['sending_frequency']];
+
+                $checked_data = array(
+                    "one_time_checked" => "",
+                    "weekly_checked" => "",
+                    "monthly_checked" => "",
+                );
                 $week_selectize = "<select name='week_day'>";
+
                 foreach ((new NewsLetterPluginAssistant())->days as $index => $day){
-                    $week_selectize .= "<option value='".$index."'>".$day."</option>";
+                    $checked = "";
+//                    print_r(array(
+//                        "index" => $index,
+//                        "value" => $post_data[$meta_keys['week_day']]
+//                    ));
+
+                    if ($post_data[$meta_keys['week_day']] == $index){
+                        $checked = "selected";
+                    }
+                    $week_selectize .= "<option $checked value='".$index."'>".$day."</option>";
                 }
                 $week_selectize .= "</select>";
                 
                 $date_selectize = "<select name='month_date'>";
                 for ($i=1; $i<=31; $i++){
-                    $date_selectize .= "<option value='".$i."'>".$i."</option>";
+                    $checked = "";
+                    if ($post_data[$meta_keys['month_date']] == $i){
+                        $checked = "selected";
+                    }
+                    $date_selectize .= "<option $checked value='".$i."'>".$i."</option>";
                 }
                 $date_selectize .= "</select>";
-                
+
+                $checked_data[$value."_checked"] = "checked";
+                if (!$value){
+                    $checked_data['one_time_checked'] = "checked";
+                }
                 
 
-                $html = (new NewsLetterPluginAssistant())->frequency_html_generate(array(
+                $html = (new NewsLetterPluginAssistant())->frequency_html_generate(array_merge(array(
                     "week_selectize" => $week_selectize,
                     "date_selectize" => $date_selectize,
-                ));
+                ),$checked_data));
 
                 echo $html;
             },$this->post_type);
@@ -124,16 +195,11 @@ class Init extends NewsLetterPluginConfig
             ),
         ));
 
-        // Register custom meta field
-        register_post_meta('post', 'book_author', array(
-            'type' => 'string',
-            'description' => 'Book Author',
-            'single' => true,
-            'show_in_rest' => true,
-        ));
 
         $this->add_custom_fields();
 
+        /// save post when submit
+        add_action('edit_post', [$this,'save_post_meta']);
 
 
     }
