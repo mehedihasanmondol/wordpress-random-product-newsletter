@@ -1,0 +1,21 @@
+{
+    "name": "vendor/packages",
+    "autoload": {
+        "psr-4": {
+            "Vendor\\Packages\\": "src/"
+        },
+        "classmap": [
+            "plugin"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Mahadi hasan",
+            "email": "hasanmahadi889@gmail.com"
+        }
+    ],
+    "require": {
+        "mustache/mustache": "^2.12",
+        "sendgrid/sendgrid": "*"
+    }
+}
