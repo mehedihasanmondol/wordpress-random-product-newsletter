@@ -12,6 +12,7 @@ return array(
     'Init' => $baseDir . '/plugin/Init.php',
     'NewsLetterPluginAssistant' => $baseDir . '/plugin/NewsLetterPluginAssistant.php',
     'NewsLetterPluginConfig' => $baseDir . '/plugin/NewsLetterPluginConfig.php',
+    'NewsLetterPluginCronJob' => $baseDir . '/plugin/NewsLetterPluginCronJob.php',
     'SendGrid' => $vendorDir . '/sendgrid/sendgrid/lib/SendGrid.php',
     'TwilioEmail' => $vendorDir . '/sendgrid/sendgrid/lib/TwilioEmail.php',
 );

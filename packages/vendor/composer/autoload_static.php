@@ -74,6 +74,7 @@ class ComposerStaticInitb44a9b29498e482bd3c0e20f3341c378
         'Init' => __DIR__ . '/../..' . '/plugin/Init.php',
         'NewsLetterPluginAssistant' => __DIR__ . '/../..' . '/plugin/NewsLetterPluginAssistant.php',
         'NewsLetterPluginConfig' => __DIR__ . '/../..' . '/plugin/NewsLetterPluginConfig.php',
+        'NewsLetterPluginCronJob' => __DIR__ . '/../..' . '/plugin/NewsLetterPluginCronJob.php',
         'SendGrid' => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/SendGrid.php',
         'TwilioEmail' => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/TwilioEmail.php',
     );

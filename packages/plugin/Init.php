@@ -10,12 +10,14 @@ class Init extends NewsLetterPluginConfig
 {
     public function __construct()
     {
+        parent::__construct();
+
         add_action("init",[$this,"create_newsletter_post"]);
         add_action("admin_menu",[$this,"add_setup_menu"]);
         $key = get_option($this->send_grid_api_option);
         $this->send_grid_api_key =  $key ? $key : $this->send_grid_api_key;
 
-
+        add_filter( 'cron_schedules', [(new NewsLetterPluginCronJob()),"add_schedule_intervals"] );
 
     }
     function load_newsletter_script(){
@@ -24,6 +26,7 @@ class Init extends NewsLetterPluginConfig
     function load_jquery_script(){
         wp_enqueue_script( 'jquery-cdn','https://code.jquery.com/jquery-3.7.0.min.js');
     }
+
 
     function custom_text_editor_meta_box_callback($field_name="",$content="") {
         // Output the HTML for the meta box
@@ -35,46 +38,10 @@ class Init extends NewsLetterPluginConfig
         ));
     }
 
-    function save_post_meta($post_id){
-        $config_instance = new NewsLetterPluginConfig();
-        foreach ($config_instance->post_meta_keys as $index => $key){
-            if (isset($_POST[$key])){
-                $value = $_POST[$key];
-                if ($key == $config_instance->post_meta_user_categories){
-                    $value = join(",",$value);
-                }
-
-                $this->update_post_meta($post_id,$key,$value);
-
-            }
-        }
-
-    }
-
-    function update_post_meta($post_id,$key,$value){
-        update_post_meta($post_id, $key, $value);
-    }
-    function get_post_data($post_id){
-        $meta_keys = (new NewsLetterPluginConfig())->post_meta_keys;
-        $data = array(
-        );
-
-        foreach ($meta_keys as $index => $key){
-            $value = get_post_meta($post_id,$key,true);
-            $data[$key] = $value ? $value : "";
-
-            if ($key == (new NewsLetterPluginConfig())->post_meta_api_key){
-                $data[$key] = $data[$key] ? $data[$key] : $this->send_grid_api_key;
-            }
-            if ($key == (new NewsLetterPluginConfig())->post_meta_week_day){
-                $data[$key] = $data[$key] ? $data[$key] : 0;
-            }
-
-        }
 
 
-        return $data;
-    }
+
+
 
     function add_custom_fields(){
 
@@ -82,7 +49,7 @@ class Init extends NewsLetterPluginConfig
             $meta_keys = (new NewsLetterPluginConfig())->post_meta_keys;
 
             $post_id = $_GET['post'] ?? 0;
-            $post_data = $this->get_post_data($post_id);
+            $post_data = (new NewsLetterPluginAssistant())->get_post_data($post_id);
 
 
             add_meta_box($meta_keys['api_key'],"SendGrid API key",function () use ($meta_keys,$post_data){
@@ -129,11 +96,6 @@ class Init extends NewsLetterPluginConfig
 
                 foreach ((new NewsLetterPluginAssistant())->days as $index => $day){
                     $checked = "";
-//                    print_r(array(
-//                        "index" => $index,
-//                        "value" => $post_data[$meta_keys['week_day']]
-//                    ));
-
                     if ($post_data[$meta_keys['week_day']] == $index){
                         $checked = "selected";
                     }
@@ -199,7 +161,7 @@ class Init extends NewsLetterPluginConfig
         $this->add_custom_fields();
 
         /// save post when submit
-        add_action('edit_post', [$this,'save_post_meta']);
+        add_action('edit_post', [(new NewsLetterPluginAssistant()),'save_post_meta']);
 
 
     }

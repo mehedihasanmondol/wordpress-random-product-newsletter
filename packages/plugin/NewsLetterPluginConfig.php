@@ -26,6 +26,8 @@ class NewsLetterPluginConfig
         "sending_frequency" => "newsletter_sending_frequency",
         "week_day" => "week_day",
         "month_date" => "month_date",
+        "cron" => 'cron',
+        "cron_time" => 'cron_time',
     );
 
     public $post_meta_api_key;
@@ -35,6 +37,8 @@ class NewsLetterPluginConfig
     public $post_meta_sending_frequency;
     public $post_meta_week_day;
     public $post_meta_month_date;
+    public $post_meta_cron;
+    public $post_meta_cron_time;
     public function __construct()
     {
         $this->post_meta_api_key = $this->post_meta_keys['api_key'];
@@ -44,6 +48,8 @@ class NewsLetterPluginConfig
         $this->post_meta_sending_frequency = $this->post_meta_keys['sending_frequency'];
         $this->post_meta_week_day = $this->post_meta_keys['week_day'];
         $this->post_meta_month_date = $this->post_meta_keys['month_date'];
+        $this->post_meta_cron = $this->post_meta_keys['cron'];
+        $this->post_meta_cron_time = $this->post_meta_keys['cron_time'];
     }
 
 }
