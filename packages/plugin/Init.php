@@ -146,6 +146,32 @@ class Init extends NewsLetterPluginConfig
             },$this->post_type);
 
 
+            /// test mode checkbox
+            add_meta_box($meta_keys['test_mode'],"Test mode / Live mode",function () use ($meta_keys,$post_data){
+
+                $value = $post_data[$meta_keys['test_mode']];
+
+                $checked_data = array(
+                    "test_mode_checked" => $value == 'test' ? "checked" : "",
+                    "live_mode_checked" => $value == 'live' ? "checked" : "",
+                );
+
+                $html = (new NewsLetterPluginAssistant())->test_mail_checkbox_html_generate($checked_data);
+
+                echo $html;
+            },$this->post_type,'side');
+
+
+            add_meta_box($meta_keys['test_email_1'],"Test email 1",function () use ($meta_keys,$post_data){
+                echo "<input class='regular-text' value='".$post_data[$meta_keys['test_email_1']]."' name='".$meta_keys['test_email_1']."' style='width:100%' type='text' placeholder='Test email 1'/>";
+            },$this->post_type,'side');
+            
+            add_meta_box($meta_keys['test_email_2'],"Test email 2",function () use ($meta_keys,$post_data){
+                echo "<input class='regular-text' value='".$post_data[$meta_keys['test_email_2']]."' name='".$meta_keys['test_email_2']."' style='width:100%' type='text' placeholder='Test email 2'/>";
+            },$this->post_type,'side');
+            
+
+
 
 
 
@@ -171,7 +197,7 @@ class Init extends NewsLetterPluginConfig
                 "title" ,
 //                "editor",
                 "show_ui",
-                "page-attributes"
+//                "page-attributes"
             ),
         ));
 

@@ -47,6 +47,20 @@ class NewsLetterPluginAssistant
         return $template_maker->render($html_form,$data);
     }
 
+    public function test_mail_checkbox_html_generate($data=array(
+//        "test_mode_checked" => "",
+//        "line_mode_checked" => "",
+    )){
+        $html_form = file_get_contents(NEWS_LETTER_PLUGIN_DIR."/assets/html/test-mode.html");
+        $template_maker = new Mustache_Engine(array(
+            'escape' => function($value) {
+                return $value;
+            }
+        ));
+        return $template_maker->render($html_form,$data);
+    }
+
+
     function save_post_meta($post_id){
         $config_instance = new NewsLetterPluginConfig();
         if (isset($_POST[$config_instance->post_meta_api_key])){
@@ -57,6 +71,7 @@ class NewsLetterPluginAssistant
             }
 
         }
+
         foreach ($config_instance->post_meta_keys as $index => $key){
             if (isset($_POST[$key])){
                 $value = $_POST[$key];
@@ -100,6 +115,12 @@ class NewsLetterPluginAssistant
             if ($key == (new NewsLetterPluginConfig())->post_meta_cron){
                 $data[$key] = $data[$key] ? $data[$key] : 0;
             }
+
+            if ($key == (new NewsLetterPluginConfig())->post_meta_test_mode){
+                $data[$key] = $data[$key] ? $data[$key] : 'test';
+            }
+
+
 
 
         }

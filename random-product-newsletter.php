@@ -8,12 +8,13 @@ define("NEWS_LETTER_PLUGIN_DIR_URL",plugin_dir_url(__FILE__));
 
 new Init();
 new DummyUserCategoryRegister();
+(new NewsLetterPluginCronJob())->register_cron_jobs();
 
+//function custom_every_minute_cronjob() {
+//    // Your custom code to run on the cron schedule
+//    (new NewsLetterPluginAssistant())->update_post_meta(2,"cron_hook_register",true);
+//}
 
-function custom_every_minute_cronjob() {
-    // Your custom code to run on the cron schedule
-    (new NewsLetterPluginAssistant())->update_post_meta(2,"cron_hook_register",true);
-}
 //add_action('custom_cron_hook', 'custom_cron_job');
 
 
@@ -67,7 +68,7 @@ function custom_every_minute_cronjob() {
 //
 //register_deactivation_hook( __FILE__, 'custom_deactivation' );
 
-(new NewsLetterPluginCronJob())->register_cron_jobs();
+
 //$roles = wp_roles();
 //// Get an array of all the role names
 //$role_names = $roles->get_names();
@@ -166,3 +167,23 @@ function custom_every_minute_cronjob() {
 //    }
 //}
 //print_r($message_params);
+
+
+
+//// Create a new post
+//$new_post = array(
+//    'post_title'    => 'My New Post',
+//    'post_content'  => 'This is the content of my new post.',
+//    'post_status'   => 'publish', // 'publish', 'draft', 'pending', etc.
+//    'post_author'   => 1, // Author's user ID
+//    'post_type'     => 'unsubscription_post', // Post type: 'post', 'page', or custom post type
+//);
+//
+//// Insert the post into the database
+//$new_post_id = wp_insert_post($new_post);
+//
+//if ($new_post_id) {
+//    echo 'New post created with ID: ' . $new_post_id;
+//} else {
+//    echo 'Failed to create post.';
+//}

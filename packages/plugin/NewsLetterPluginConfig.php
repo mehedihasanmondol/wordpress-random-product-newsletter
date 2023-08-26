@@ -35,6 +35,9 @@ class NewsLetterPluginConfig
         "cron" => 'cron',
         "cron_time" => 'cron_time',
         "cron_status" => 'cron_status',
+        "test_mode" => 'test_mode',
+        "test_email_1" => 'test_email_1',
+        "test_email_2" => 'test_email_2',
     );
 
     public $post_meta_api_key;
@@ -47,6 +50,9 @@ class NewsLetterPluginConfig
     public $post_meta_cron;
     public $post_meta_cron_time;
     public $post_meta_cron_status;
+    public $post_meta_test_mode;
+    public $post_meta_test_email_1;
+    public $post_meta_test_email_2;
     public function __construct()
     {
 
@@ -70,6 +76,9 @@ class NewsLetterPluginConfig
         $this->post_meta_cron = $this->post_meta_keys['cron'];
         $this->post_meta_cron_time = $this->post_meta_keys['cron_time'];
         $this->post_meta_cron_status = $this->post_meta_keys['cron_status'];
+        $this->post_meta_test_mode = $this->post_meta_keys['test_mode'];
+        $this->post_meta_test_email_1 = $this->post_meta_keys['test_email_1'];
+        $this->post_meta_test_email_2 = $this->post_meta_keys['test_email_2'];
     }
 
 }
