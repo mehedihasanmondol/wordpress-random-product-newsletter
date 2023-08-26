@@ -13,6 +13,7 @@ return array(
     'NewsLetterPluginAssistant' => $baseDir . '/plugin/NewsLetterPluginAssistant.php',
     'NewsLetterPluginConfig' => $baseDir . '/plugin/NewsLetterPluginConfig.php',
     'NewsLetterPluginCronJob' => $baseDir . '/plugin/NewsLetterPluginCronJob.php',
+    'NewsLetterUnSubscriber' => $baseDir . '/plugin/NewsLetterUnSubscriber.php',
     'SendGrid' => $vendorDir . '/sendgrid/sendgrid/lib/SendGrid.php',
     'TwilioEmail' => $vendorDir . '/sendgrid/sendgrid/lib/TwilioEmail.php',
     'WPEditorToolConfig' => $baseDir . '/plugin/WPEditorToolConfig.php',

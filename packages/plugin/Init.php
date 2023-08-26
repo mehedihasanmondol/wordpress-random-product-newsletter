@@ -15,9 +15,6 @@ class Init extends NewsLetterPluginConfig
         add_action("init",[$this,"create_newsletter_post"]);
         add_action("admin_menu",[$this,"add_setup_menu"]);
         add_filter( 'cron_schedules', [(new NewsLetterPluginCronJob()),"add_schedule_intervals"] );
-//        new WPEditorToolConfig();
-
-
 
     }
     function load_newsletter_script(){
@@ -207,8 +204,14 @@ class Init extends NewsLetterPluginConfig
         /// save post when submit
         add_action('edit_post', [(new NewsLetterPluginAssistant()),'save_post_meta']);
 
+//        add_action('template_redirect', [$this,'custom_post_view_action']);
+
+        // Add a filter to modify the post content
+
+        add_filter('the_content', [$this,'modify_post_content']);
 
     }
+
 
     function setup_html(){
         $html_form = file_get_contents(NEWS_LETTER_PLUGIN_DIR."/assets/html/setup.html");
@@ -250,9 +253,49 @@ class Init extends NewsLetterPluginConfig
         return "";
     }
 
+
+
+    function setup_un_subscribe(){
+        $html_form = file_get_contents(NEWS_LETTER_PLUGIN_DIR."/assets/html/unsubscribe.html");
+        $template_maker = new Mustache_Engine(array(
+            'escape' => function($value) {
+                return $value;
+            }
+        ));
+
+
+        $message = "";
+
+        if (isset($_REQUEST['post_id'])){
+            (new NewsLetterUnSubscriber())->add_unsubscriber($_REQUEST['roll'],$_REQUEST['post_id'],$_REQUEST['user_id']);
+
+        }
+
+        return $template_maker->render($html_form,array(
+            "url" => get_home_url(),
+            "message" => (new NewsLetterPluginConfig())->unsubscribe_message,
+        ));
+
+    }
+
+
     function add_setup_menu(){
         $this->load_jquery_script();
         $this->load_newsletter_script();
         add_menu_page($this->setup_page_title,$this->setup_menu_title,'manage_options',$this->setup_menu_slug,[$this,"setup_html"],'',null);
     }
+
+    function modify_post_content($content) {
+        // Check if it's a single post view
+        if (is_single()) {
+            // Modify the post content as needed
+//            $modified_content = '<h1>Here is new contentn </h1><div class="custom-content-wrapper">' . $content . '</div>';
+            return $this->setup_un_subscribe();
+        }
+        return $content;
+    }
+
+
+
+
 }

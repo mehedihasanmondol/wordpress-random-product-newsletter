@@ -123,6 +123,11 @@ class NewsLetterPluginAssistant
 
             $config = new NewsLetterPluginConfig();
 
+            $message .= "<hr/>";
+            $message .= $this->get_unsubscribe_button_html(array(
+                "url" => home_url()."/product-newsletter/".$post_data['post_name']."/?roll=customer"."&post_id=".$post_id."&user_id=0"
+            ));
+
             try{
                 $email = new \SendGrid\Mail\Mail();
                 $email->setFrom($config->from_email, $config->from_email_name);
@@ -162,12 +167,14 @@ class NewsLetterPluginAssistant
         $data = array(
             "post_date" => "",
             "post_title" => "",
+            "post_name" => "",
         );
 
         $get_post = get_post($post_id);
         if ($get_post){
             $data['post_date'] = $get_post->post_date;
             $data['post_title'] = $get_post->post_title;
+            $data['post_name'] = $get_post->post_name;
         }
 
 
@@ -205,6 +212,7 @@ class NewsLetterPluginAssistant
             'fields'    => array(
                 "display_name",
                 "user_email",
+                "id",
             ),
         );
 
@@ -212,7 +220,7 @@ class NewsLetterPluginAssistant
             global $wpdb;
             $table_name = $wpdb->prefix . 'wc_customer_lookup'; // Replace with your custom table name
 
-            $query = "SELECT first_name,last_name,email FROM $table_name";
+            $query = "SELECT first_name,last_name,email,id FROM $table_name";
             $results = $wpdb->get_results($query);
 
             foreach ($results as $index => $result){
@@ -223,6 +231,17 @@ class NewsLetterPluginAssistant
         }
 
         return get_users( $args );
+    }
+
+    function get_unsubscribe_button_html($data=array()){
+        $html_form = file_get_contents(NEWS_LETTER_PLUGIN_DIR."/assets/html/unsubscribe-button.html");
+        $template_maker = new Mustache_Engine(array(
+            'escape' => function($value) {
+                return $value;
+            }
+        ));
+        return $template_maker->render($html_form,$data);
+
     }
 
 }

@@ -12,6 +12,7 @@ class NewsLetterPluginCronJob
 
         $config = new NewsLetterPluginConfig();
         $assistant = new NewsLetterPluginAssistant();
+        $unsubscriber = new NewsLetterUnSubscriber();
         $template_maker = new Mustache_Engine(array(
             'escape' => function($value) {
                 return $value;
@@ -26,47 +27,55 @@ class NewsLetterPluginCronJob
             $users = $assistant->get_users_by_roll($role);
 
             foreach ($users as $user){
-                $message = $post_data[$config->post_meta_body];
-                if ($user->user_email){
-                    try {
 
-                        $message_params = array(
-                            "user_name" => $user->display_name,
-                            "item_name" => "",
+                if (!$unsubscriber->get_unsubscription($post_id,$user->id)){
+                    $message = $post_data[$config->post_meta_body];
+                    if ($user->user_email){
+                        try {
+
+                            $message_params = array(
+                                "user_name" => $user->display_name,
+                                "item_name" => "",
 //                            "item_image" => "",
 //                            "item_link" => "",
-                        );
+                            );
 
-                        $args     = array( 'post_type' => 'product', 'posts_per_page' => 1 ,'orderby' => 'rand');
-                        $products = get_posts( $args );
+                            $args     = array( 'post_type' => 'product', 'posts_per_page' => 1 ,'orderby' => 'rand');
+                            $products = get_posts( $args );
 
-                        if ($products){
-                            foreach ($products as $product){
+                            if ($products){
+                                foreach ($products as $product){
 //                                $message_params['item_name'] = $product->post_title;
-                                $product_link = home_url()."/product/".$product->post_name."/?date=".date("Y-m-d")."&email=".$post_data['post_title'];
-                                $message_params['item_name'] = "<a href='".$product_link."'>".$product->post_title."</a>";
-                            }
-                        }
-
-                        $email = new \SendGrid\Mail\Mail();
-                        $email->setFrom($config->from_email, $config->from_email_name);
-                        $email->setSubject($post_data[$config->post_meta_subject]);
-                        $email->addTo($user->user_email, $user->display_name);
-                        $email->addContent(
-                            "text/html", $template_maker->render($message,$message_params)
-                        );
-                        $sendgrid = new \SendGrid($post_data[$config->post_meta_api_key]);
-                        $response = $sendgrid->send($email);
-
-                        if ($response->statusCode() != 200 and $response->statusCode() != 202){
-                            $error_message = "";
-                            foreach (json_decode($response->body(),true)['errors'] as $error){
-                                $error_message .= $error['message'];
+                                    $product_link = home_url()."/product/".$product->post_name."/?date=".date("Y-m-d")."&email=".$post_data['post_title'];
+                                    $message_params['item_name'] = "<a href='".$product_link."'>".$product->post_title."</a>";
+                                }
                             }
 
-                            update_option($config->send_grid_api_message,$error_message." at ".$assistant->text_date_time(),'no');
+                            $message .= "<hr/>";
+                            $message .= $assistant->get_unsubscribe_button_html(array(
+                                "url" => home_url()."/product-newsletter/".$post_data['post_name']."/?roll=".$role."&post_id=".$post_id."&user_id=".$user->id
+                            ));
 
-                        }
+
+                            $email = new \SendGrid\Mail\Mail();
+                            $email->setFrom($config->from_email, $config->from_email_name);
+                            $email->setSubject($post_data[$config->post_meta_subject]);
+                            $email->addTo($user->user_email, $user->display_name);
+                            $email->addContent(
+                                "text/html", $template_maker->render($message,$message_params)
+                            );
+                            $sendgrid = new \SendGrid($post_data[$config->post_meta_api_key]);
+                            $response = $sendgrid->send($email);
+
+                            if ($response->statusCode() != 200 and $response->statusCode() != 202){
+                                $error_message = "";
+                                foreach (json_decode($response->body(),true)['errors'] as $error){
+                                    $error_message .= $error['message'];
+                                }
+
+                                update_option($config->send_grid_api_message,$error_message." at ".$assistant->text_date_time(),'no');
+
+                            }
 
 //                        $result_data = array(
 //                            "from_email" => $config->from_email,
@@ -83,10 +92,12 @@ class NewsLetterPluginCronJob
 //                        $assistant->update_post_meta($post_id,$config->post_meta_cron_status,json_encode($result_data));
 
 //                        return $response->statusCode();
-                    } catch (Exception $e) {
-                        update_option($config->send_grid_api_message,$e->getMessage()." at ".$assistant->text_date_time(),'no');
+                        } catch (Exception $e) {
+                            update_option($config->send_grid_api_message,$e->getMessage()." at ".$assistant->text_date_time(),'no');
+                        }
                     }
                 }
+
 
             }
         }

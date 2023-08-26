@@ -15,6 +15,12 @@ class NewsLetterPluginConfig
     public $label = "Product newsletter";
     public $setup_page_title = "Random product newsletter settings";
     public $setup_menu_title = "Newsletter";
+
+    public $unsubscriber_page_title = "Unsubscribe";
+    public $unsubscriber_menu_title = "Unsubscriber";
+    public $unsubscriber_menu_menu_slug = "unsubscribe";
+    public $unsubscribe_message = "Successfully UnSubscribed";
+
     public $send_grid_api_key = "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";
 
     public $from_email = "connection.mahadihasan@gmail.com";
@@ -24,6 +30,8 @@ class NewsLetterPluginConfig
     public $send_grid_api_from_email = "send_grid_from_email";
     public $send_grid_api_from_email_name = "send_grid_from_email_name";
     public $send_grid_api_message = "send_grid_api_message";
+
+    public $unsubscriber_table_name = "unsubscribers";
 
     public $post_meta_keys = array(
         "api_key" => "newsletter_api_key",
