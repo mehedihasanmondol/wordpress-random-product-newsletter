@@ -23,6 +23,7 @@ class NewsLetterPluginConfig
     public $send_grid_api_option = "send_grid_api_key";
     public $send_grid_api_from_email = "send_grid_from_email";
     public $send_grid_api_from_email_name = "send_grid_from_email_name";
+    public $send_grid_api_message = "send_grid_api_message";
 
     public $post_meta_keys = array(
         "api_key" => "newsletter_api_key",

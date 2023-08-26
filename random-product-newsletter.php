@@ -88,7 +88,7 @@ new DummyUserCategoryRegister();
 
 
 
-
+//
 //$email = new \SendGrid\Mail\Mail();
 //$config = new NewsLetterPluginConfig();
 //try {
@@ -98,14 +98,21 @@ new DummyUserCategoryRegister();
 //    $email->addContent(
 //        "text/html", "hi how area your"
 //    );
-//    $sendgrid = new \SendGrid('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');
+//    $sendgrid = new \SendGrid('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');
 //    $response = $sendgrid->send($email);
-//    print_r(array(
-//        "from_email" => $config->from_email,
-//        "from_email_name" => $config->from_email_name,
-//        "apiKey" => $config->send_grid_api_key,
-//    ));
-//    print_r($response);
+////    print_r(array(
+////        "from_email" => $config->from_email,
+////        "from_email_name" => $config->from_email_name,
+////        "apiKey" => $config->send_grid_api_key,
+////    ));
+//
+//    print_r(json_decode($response->body(),true));
+//
+//    $message = "";
+//    foreach (json_decode($response->body(),true)['errors'] as $error){
+//        $message .= $error['message'];
+//    }
+//    echo $message;
 //
 ////                        return $response->statusCode();
 //} catch (Exception $e) {

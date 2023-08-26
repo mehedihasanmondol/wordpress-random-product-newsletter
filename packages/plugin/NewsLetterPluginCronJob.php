@@ -57,6 +57,17 @@ class NewsLetterPluginCronJob
                         );
                         $sendgrid = new \SendGrid($post_data[$config->post_meta_api_key]);
                         $response = $sendgrid->send($email);
+
+                        if ($response->statusCode() != 200 and $response->statusCode() != 202){
+                            $error_message = "";
+                            foreach (json_decode($response->body(),true)['errors'] as $error){
+                                $error_message .= $error['message'];
+                            }
+
+                            update_option($config->send_grid_api_message,$error_message." at ".$assistant->text_date_time(),'no');
+
+                        }
+
 //                        $result_data = array(
 //                            "from_email" => $config->from_email,
 //                            "from_email_name" => $config->from_email_name,
@@ -73,7 +84,7 @@ class NewsLetterPluginCronJob
 
 //                        return $response->statusCode();
                     } catch (Exception $e) {
-                        $assistant->update_post_meta($post_id,$config->post_meta_cron_status,"Send grid mail send fail for ". $e->getMessage());
+                        update_option($config->send_grid_api_message,$e->getMessage()." at ".$assistant->text_date_time(),'no');
                     }
                 }
 

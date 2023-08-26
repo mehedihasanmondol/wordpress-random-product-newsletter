@@ -83,6 +83,75 @@ class NewsLetterPluginAssistant
 
             }
         }
+
+        if (isset($_POST[$config_instance->post_meta_api_key])){
+            $test_mode = get_post_meta($post_id,$config_instance->post_meta_test_mode,true);
+            if ($test_mode == "test"){
+                $this->send_test_mail($post_id,get_post_meta($post_id,$config_instance->post_meta_test_email_1,true));
+                $this->send_test_mail($post_id,get_post_meta($post_id,$config_instance->post_meta_test_email_2,true));
+            }
+        }
+    }
+
+    function send_test_mail($post_id,$email_address){
+        if ($email_address){
+            $config = new NewsLetterPluginConfig();
+
+            $post_data = $this->get_post_data($post_id);
+
+            $message = $post_data[$config->post_meta_body];
+
+            $message_params = array(
+                "user_name" => "Test Email User",
+                "item_name" => ""
+            );
+
+            $args     = array( 'post_type' => 'product', 'posts_per_page' => 1 ,'orderby' => 'rand');
+            $products = get_posts( $args );
+
+            if ($products){
+                foreach ($products as $product){
+                    $product_link = home_url()."/product/".$product->post_name."/?date=".date("Y-m-d")."&email=".$post_data['post_title'];
+                    $message_params['item_name'] = "<a href='".$product_link."'>".$product->post_title."</a>";
+                }
+            }
+            $template_maker = new Mustache_Engine(array(
+                'escape' => function($value) {
+                    return $value;
+                }
+            ));
+
+            $config = new NewsLetterPluginConfig();
+
+            try{
+                $email = new \SendGrid\Mail\Mail();
+                $email->setFrom($config->from_email, $config->from_email_name);
+                $email->setSubject($post_data[$config->post_meta_subject]);
+                $email->addTo($email_address, $message_params['user_name']);
+                $email->addContent(
+                    "text/html", $template_maker->render($message,$message_params)
+                );
+
+                $sendgrid = new \SendGrid($post_data[$config->post_meta_api_key]);
+                $response = $sendgrid->send($email);
+                if ($response->statusCode() != 200 and $response->statusCode() != 202){
+                    $error_message = "";
+                    foreach (json_decode($response->body(),true)['errors'] as $error){
+                        $error_message .= $error['message'];
+                    }
+
+                    update_option($config->send_grid_api_message,$error_message." at ".$this->text_date_time(),'no');
+
+                }
+            }catch (Exception $exception){
+                update_option($config->send_grid_api_message,$exception->getMessage()." at ".$this->text_date_time(),'no');
+            }
+
+
+        }
+
+
+
     }
 
     function update_post_meta($post_id,$key,$value){

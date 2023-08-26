@@ -235,6 +235,7 @@ class Init extends NewsLetterPluginConfig
             }
         }
 
+        $send_grid_api_message = get_option($this->send_grid_api_message);
 
 
         echo $template_maker->render($html_form,array(
@@ -243,6 +244,7 @@ class Init extends NewsLetterPluginConfig
             "from_email" => $this->send_grid_api_from_email,
             "page_title" => $this->setup_page_title,
             "message" => $message,
+            "send_grid_api_message" => $send_grid_api_message ? $send_grid_api_message : "",
         ));
 
         return "";
