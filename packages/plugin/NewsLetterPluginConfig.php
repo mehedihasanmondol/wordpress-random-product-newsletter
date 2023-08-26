@@ -15,8 +15,10 @@ class NewsLetterPluginConfig
     public $label = "Product newsletter";
     public $setup_page_title = "Random product newsletter settings";
     public $setup_menu_title = "Newsletter";
-    public $send_grid_api_key = "send_grid_api_key_Newsletter";
+    public $send_grid_api_key = "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";
     public $send_grid_api_option = "send_grid_api_key";
+    public $from_email = "connection.mahadihasan@gmail.com";
+    public $from_email_name = "Developer Mehedi hasan";
 
     public $post_meta_keys = array(
         "api_key" => "newsletter_api_key",
@@ -28,6 +30,7 @@ class NewsLetterPluginConfig
         "month_date" => "month_date",
         "cron" => 'cron',
         "cron_time" => 'cron_time',
+        "cron_status" => 'cron_status',
     );
 
     public $post_meta_api_key;
@@ -39,6 +42,7 @@ class NewsLetterPluginConfig
     public $post_meta_month_date;
     public $post_meta_cron;
     public $post_meta_cron_time;
+    public $post_meta_cron_status;
     public function __construct()
     {
         $this->post_meta_api_key = $this->post_meta_keys['api_key'];
@@ -50,6 +54,7 @@ class NewsLetterPluginConfig
         $this->post_meta_month_date = $this->post_meta_keys['month_date'];
         $this->post_meta_cron = $this->post_meta_keys['cron'];
         $this->post_meta_cron_time = $this->post_meta_keys['cron_time'];
+        $this->post_meta_cron_status = $this->post_meta_keys['cron_status'];
     }
 
 }

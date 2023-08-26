@@ -68,9 +68,47 @@ function custom_every_minute_cronjob() {
 //register_deactivation_hook( __FILE__, 'custom_deactivation' );
 
 (new NewsLetterPluginCronJob())->register_cron_jobs();
+//$roles = wp_roles();
+//// Get an array of all the role names
+//$role_names = $roles->get_names();
+//
+//foreach ($role_names as $role_key => $role_name) {
+//    $args = array(
+//        'role'      => 'customer', // Retrieve users with the 'customer' role
+//        'number'    => -1,         // Retrieve all customers (-1)
+//    );
+//
+//    echo $role_name;
+//    $customers = (new NewsLetterPluginAssistant())->get_users_by_roll($role_key);
+//
+//    print_r($customers);
+//}
+//
 
 
 
 
-
-
+//$email = new \SendGrid\Mail\Mail();
+//$config = new NewsLetterPluginConfig();
+//try {
+//    $email->setFrom($config->from_email, $config->from_email_name);
+//    $email->setSubject('test mail');
+//    $email->addTo('hasanmahadi889@gmail.com', "Mahadi hasan");
+//    $email->addContent(
+//        "text/html", "hi how area your"
+//    );
+//    $sendgrid = new \SendGrid($config->send_grid_api_key);
+//    $response = $sendgrid->send($email);
+//    print_r(array(
+//        "from_email" => $config->from_email,
+//        "from_email_name" => $config->from_email_name,
+//        "apiKey" => $config->send_grid_api_key,
+//    ));
+//    print_r($response);
+//
+////                        return $response->statusCode();
+//} catch (Exception $e) {
+//   echo "Send grid mail send fail for ". $e->getMessage();
+//}
+//
+//

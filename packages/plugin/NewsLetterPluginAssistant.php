@@ -106,4 +106,31 @@ class NewsLetterPluginAssistant
         return $data;
     }
 
+    function get_users_by_roll($role){
+        $args = array(
+            'role'      => $role, // Retrieve users with the 'customer' role
+            'number'    => -1,         // Retrieve all customers (-1)
+            'fields'    => array(
+                "display_name",
+                "user_email",
+            ),
+        );
+
+        if ($role == "customer"){
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'wc_customer_lookup'; // Replace with your custom table name
+
+            $query = "SELECT first_name,last_name,email FROM $table_name";
+            $results = $wpdb->get_results($query);
+
+            foreach ($results as $index => $result){
+                $result->display_name = $result->first_name." ".$result->last_name;
+                $result->user_email = $result->email;
+            }
+            return $results;
+        }
+
+        return get_users( $args );
+    }
+
 }

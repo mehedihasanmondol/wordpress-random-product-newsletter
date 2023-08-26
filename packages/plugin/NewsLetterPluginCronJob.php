@@ -9,7 +9,57 @@
 class NewsLetterPluginCronJob
 {
     function set_cron_job($post_id){
-//        $post_data = (new NewsLetterPluginAssistant())->get_post_data($post_id);
+
+        $config = new NewsLetterPluginConfig();
+        $assistant = new NewsLetterPluginAssistant();
+        $template_maker = new Mustache_Engine(array(
+            'escape' => function($value) {
+                return $value;
+            }
+        ));
+
+
+        $post_data = $assistant->get_post_data($post_id);
+        $user_roles = explode(",",$post_data[(new NewsLetterPluginConfig())->post_meta_user_categories]);
+
+        foreach($user_roles as $role){
+            $users = $assistant->get_users_by_roll($role);
+
+            foreach ($users as $user){
+                $message = $post_data[$config->post_meta_body];
+                if ($user->user_email){
+                    try {
+                        $email = new \SendGrid\Mail\Mail();
+                        $email->setFrom($config->from_email, $config->from_email_name);
+                        $email->setSubject($post_data[$config->post_meta_subject]);
+                        $email->addTo($user->user_email, $user->display_name);
+                        $email->addContent(
+                            "text/html", $message
+                        );
+                        $sendgrid = new \SendGrid($post_data[$config->post_meta_api_key]);
+                        $response = $sendgrid->send($email);
+//                        $result_data = array(
+//                            "from_email" => $config->from_email,
+//                            "from_email_name" => $config->from_email_name,
+//                            "subject" => $post_data[$config->post_meta_subject],
+//                            "to_email" => $user->user_email,
+//                            "to_name" => $user->display_name,
+//                            "message" => $message,
+//                            "api_key" => $post_data[$config->post_meta_api_key],
+//                            "status" => $response->statusCode(),
+//                        );
+
+
+//                        $assistant->update_post_meta($post_id,$config->post_meta_cron_status,json_encode($result_data));
+
+//                        return $response->statusCode();
+                    } catch (Exception $e) {
+                        $assistant->update_post_meta($post_id,$config->post_meta_cron_status,"Send grid mail send fail for ". $e->getMessage());
+                    }
+                }
+
+            }
+        }
 
 //        (new NewsLetterPluginAssistant())->update_post_meta($post_id,"cron",1);
         (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,date("Y-m-d H:i:s"));
@@ -62,6 +112,7 @@ class NewsLetterPluginCronJob
 
         }
     }
+
 
     function add_schedule_intervals( $schedules ) {
         // add a 'everyminute' schedule to the existing set
