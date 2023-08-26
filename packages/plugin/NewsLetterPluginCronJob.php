@@ -29,12 +29,31 @@ class NewsLetterPluginCronJob
                 $message = $post_data[$config->post_meta_body];
                 if ($user->user_email){
                     try {
+
+                        $message_params = array(
+                            "user_name" => $user->display_name,
+                            "item_name" => "",
+//                            "item_image" => "",
+//                            "item_link" => "",
+                        );
+
+                        $args     = array( 'post_type' => 'product', 'posts_per_page' => 1 ,'orderby' => 'rand');
+                        $products = get_posts( $args );
+
+                        if ($products){
+                            foreach ($products as $product){
+//                                $message_params['item_name'] = $product->post_title;
+                                $product_link = home_url()."/product/".$product->post_name."/?date=".date("Y-m-d")."&email=".$post_data['post_title'];
+                                $message_params['item_name'] = "<a href='".$product_link."'>".$product->post_title."</a>";
+                            }
+                        }
+
                         $email = new \SendGrid\Mail\Mail();
                         $email->setFrom($config->from_email, $config->from_email_name);
                         $email->setSubject($post_data[$config->post_meta_subject]);
                         $email->addTo($user->user_email, $user->display_name);
                         $email->addContent(
-                            "text/html", $message
+                            "text/html", $template_maker->render($message,$message_params)
                         );
                         $sendgrid = new \SendGrid($post_data[$config->post_meta_api_key]);
                         $response = $sendgrid->send($email);
@@ -61,7 +80,10 @@ class NewsLetterPluginCronJob
             }
         }
 
-//        (new NewsLetterPluginAssistant())->update_post_meta($post_id,"cron",1);
+        if($post_data[$config->post_meta_sending_frequency] == "one_time"){
+            (new NewsLetterPluginAssistant())->update_post_meta($post_id,"cron",1);
+        }
+
         (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,date("Y-m-d H:i:s"));
 
     }
@@ -84,7 +106,7 @@ class NewsLetterPluginCronJob
                 $args = array($post_id);
                 add_action($hook_name,[$this,"set_cron_job"],10,$args);
                 if ( ! wp_next_scheduled( $hook_name ,$args) ) {
-                    $time = $assistant->text_date_time("Y-m-d",$post[$config->post_meta_cron_time])." 22:59:01";
+                    $time = $assistant->text_date_time("Y-m-d",$post[$config->post_meta_cron_time])." 00:00:01";
                     wp_schedule_single_event(strtotime($time), $hook_name,$args);
                 }
             }

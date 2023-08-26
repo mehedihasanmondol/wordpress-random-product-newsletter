@@ -97,7 +97,7 @@ function custom_every_minute_cronjob() {
 //    $email->addContent(
 //        "text/html", "hi how area your"
 //    );
-//    $sendgrid = new \SendGrid($config->send_grid_api_key);
+//    $sendgrid = new \SendGrid('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');
 //    $response = $sendgrid->send($email);
 //    print_r(array(
 //        "from_email" => $config->from_email,
@@ -110,5 +110,59 @@ function custom_every_minute_cronjob() {
 //} catch (Exception $e) {
 //   echo "Send grid mail send fail for ". $e->getMessage();
 //}
+
+//if (class_exists('WooCommerce')) {
 //
+//}
+
+//if (class_exists('WooCommerce')) {
+//    // Get a random product
+//    $args = array(
+//        'post_type' => 'product',
+//        'posts_per_page' => 1,
+//        'orderby' => 'rand',
+//    );
 //
+//    $random_products = new WP_Query($args);
+//
+//    if ($random_products->have_posts()) {
+//        while ($random_products->have_posts()) {
+//            $random_products->the_post();
+//
+//            // Display the product information
+//            the_title();
+//            echo '<div class="product-description">' . get_the_excerpt() . '</div>';
+//            echo '<div class="product-price">' . get_post_meta(get_the_ID(), '_price', true) . '</div>';
+//            // Add more product information as needed
+//        }
+//    } else {
+//        echo 'No random products found.';
+//    }
+//
+//    // Restore original post data
+//    wp_reset_postdata();
+//} else {
+//    echo 'WooCommerce is not active.';
+//}
+
+
+
+//echo home_url();
+//$message_params = array(
+//    "user_name" => $user->display_name,
+//    "item_name" => "",
+////                            "item_image" => "",
+////                            "item_link" => "",
+//);
+//
+//$args     = array( 'post_type' => 'product', 'posts_per_page' => 1 ,'orderby' => 'rand');
+//$products = get_posts( $args );
+//
+//if ($products){
+//    foreach ($products as $product){
+////                                $message_params['item_name'] = $product->post_title;
+//        $product_link = home_url()."/product/".$product->post_name."/?date=".date("Y-m-d")."&email=";
+//        $message_params['item_name'] = "<a href='".$product_link."'>.$product->post_title.</a>";
+//    }
+//}
+//print_r($message_params);

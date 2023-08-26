@@ -76,12 +76,14 @@ class NewsLetterPluginAssistant
     function get_post_data($post_id){
         $meta_keys = (new NewsLetterPluginConfig())->post_meta_keys;
         $data = array(
-            "post_date" => ""
+            "post_date" => "",
+            "post_title" => "",
         );
 
         $get_post = get_post($post_id);
         if ($get_post){
             $data['post_date'] = $get_post->post_date;
+            $data['post_title'] = $get_post->post_title;
         }
 
 

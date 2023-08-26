@@ -77,6 +77,7 @@ class ComposerStaticInitb44a9b29498e482bd3c0e20f3341c378
         'NewsLetterPluginCronJob' => __DIR__ . '/../..' . '/plugin/NewsLetterPluginCronJob.php',
         'SendGrid' => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/SendGrid.php',
         'TwilioEmail' => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/TwilioEmail.php',
+        'WPEditorToolConfig' => __DIR__ . '/../..' . '/plugin/WPEditorToolConfig.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

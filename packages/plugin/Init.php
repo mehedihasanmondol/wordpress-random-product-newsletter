@@ -14,10 +14,10 @@ class Init extends NewsLetterPluginConfig
 
         add_action("init",[$this,"create_newsletter_post"]);
         add_action("admin_menu",[$this,"add_setup_menu"]);
-        $key = get_option($this->send_grid_api_option);
-        $this->send_grid_api_key =  $key ? $key : $this->send_grid_api_key;
-
         add_filter( 'cron_schedules', [(new NewsLetterPluginCronJob()),"add_schedule_intervals"] );
+//        new WPEditorToolConfig();
+
+
 
     }
     function load_newsletter_script(){
@@ -30,12 +30,30 @@ class Init extends NewsLetterPluginConfig
 
     function custom_text_editor_meta_box_callback($field_name="",$content="") {
         // Output the HTML for the meta box
-        wp_editor($content, 'newsletter_body', array(
+        new WPEditorToolConfig();
+        $settings = array(
+            'tinymce' => array(
+                'toolbar1' => 'bold,italic,strikethrough,link,unlink,block quote,horizontal line,bullet list,numbered list,align left,align center,align right,undo,redo,fullscreen toggle,toolbar toggle,custom_button', // Add your custom button here
+                'plugins' => 'custom_tinymce_plugin', // Add your custom TinyMCE plugin name here
+            ),
+        );
+
+        $settings = array_merge($settings,array(
             'textarea_name' => $field_name, // Name of the textarea field
             'media_buttons' => true, // Show media buttons
             'textarea_rows' => 15, // Number of rows in the editor
-            'teeny' => true, // Use a minimal editor
+//            'teeny' => true, // Use a minimal editor
         ));
+
+//        wp_editor($content, 'newsletter_body', array(
+//            'textarea_name' => $field_name, // Name of the textarea field
+//            'media_buttons' => true, // Show media buttons
+//            'textarea_rows' => 15, // Number of rows in the editor
+//            'teeny' => true, // Use a minimal editor
+//        ));
+
+        wp_editor($content, 'newsletter_body', $settings);
+
     }
 
 
@@ -179,7 +197,11 @@ class Init extends NewsLetterPluginConfig
 
         if (isset($_REQUEST['save'])){
             $update = update_option($this->send_grid_api_option,$_REQUEST['api_key']);
+            $update = update_option($this->send_grid_api_from_email,$_REQUEST['from_email']);
+            $update = update_option($this->send_grid_api_from_email_name,$_REQUEST['from_email_name']);
             $this->send_grid_api_key = get_option($this->send_grid_api_option);
+            $this->send_grid_api_from_email = get_option($this->send_grid_api_from_email);
+            $this->send_grid_api_from_email_name = get_option($this->send_grid_api_from_email_name);
             if ($update){
                 $message = (new NewsLetterPluginAssistant())->message_html_generate(array(
                     "message" => "Changed has been saved."
@@ -191,6 +213,8 @@ class Init extends NewsLetterPluginConfig
 
         echo $template_maker->render($html_form,array(
             "api_key" => $this->send_grid_api_key,
+            "from_email_name" => $this->send_grid_api_from_email_name,
+            "from_email" => $this->send_grid_api_from_email,
             "page_title" => $this->setup_page_title,
             "message" => $message,
         ));

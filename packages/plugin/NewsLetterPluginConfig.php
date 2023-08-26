@@ -15,10 +15,14 @@ class NewsLetterPluginConfig
     public $label = "Product newsletter";
     public $setup_page_title = "Random product newsletter settings";
     public $setup_menu_title = "Newsletter";
-    public $send_grid_api_key = "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";
-    public $send_grid_api_option = "send_grid_api_key";
+    public $send_grid_api_key = "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";
+
     public $from_email = "connection.mahadihasan@gmail.com";
     public $from_email_name = "Developer Mehedi hasan";
+
+    public $send_grid_api_option = "send_grid_api_key";
+    public $send_grid_api_from_email = "send_grid_from_email";
+    public $send_grid_api_from_email_name = "send_grid_from_email_name";
 
     public $post_meta_keys = array(
         "api_key" => "newsletter_api_key",
@@ -45,6 +49,17 @@ class NewsLetterPluginConfig
     public $post_meta_cron_status;
     public function __construct()
     {
+
+        $key = get_option($this->send_grid_api_option);
+        $from_email = get_option($this->send_grid_api_from_email);
+        $from_email_name = get_option($this->send_grid_api_from_email_name);
+        $this->send_grid_api_key =  $key ? $key : $this->send_grid_api_key;
+        $this->send_grid_api_from_email =  $from_email ? $from_email : $this->send_grid_api_from_email;
+        $this->send_grid_api_from_email_name =  $from_email_name ? $from_email_name : $this->send_grid_api_from_email_name;
+
+
+
+
         $this->post_meta_api_key = $this->post_meta_keys['api_key'];
         $this->post_meta_subject = $this->post_meta_keys['subject'];
         $this->post_meta_body = $this->post_meta_keys['body'];

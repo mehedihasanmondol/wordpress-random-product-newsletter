@@ -15,4 +15,5 @@ return array(
     'NewsLetterPluginCronJob' => $baseDir . '/plugin/NewsLetterPluginCronJob.php',
     'SendGrid' => $vendorDir . '/sendgrid/sendgrid/lib/SendGrid.php',
     'TwilioEmail' => $vendorDir . '/sendgrid/sendgrid/lib/TwilioEmail.php',
+    'WPEditorToolConfig' => $baseDir . '/plugin/WPEditorToolConfig.php',
 );
