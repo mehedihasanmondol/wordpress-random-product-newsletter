@@ -16,7 +16,7 @@ class NewsLetterUnSubscriber
             $wpdb->insert(
                 $table_name,
                 array(
-                    'time' => date("Y-m-d H:i:s"),
+                    'time' => (new NewsLetterPluginAssistant())->current_time_stamp(),
                     'roll' => $roll,
                     'post_id' => $post_id,
                     'user_id' => $user_id,

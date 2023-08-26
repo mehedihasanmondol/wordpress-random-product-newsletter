@@ -33,6 +33,9 @@ class NewsLetterPluginConfig
 
     public $unsubscriber_table_name = "unsubscribers";
 
+
+    public $server_cron_commands = "";
+
     public $post_meta_keys = array(
         "api_key" => "newsletter_api_key",
         "subject" => "newsletter_subject",
@@ -64,6 +67,8 @@ class NewsLetterPluginConfig
     public $post_meta_test_email_2;
     public function __construct()
     {
+
+        $this->server_cron_commands = "wget -q -O - ".home_url()."/wp-cron.php?doing_wp_cron >/dev/null 2>&1";
 
         $key = get_option($this->send_grid_api_option);
         $from_email = get_option($this->send_grid_api_from_email);

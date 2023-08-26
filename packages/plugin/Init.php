@@ -248,6 +248,7 @@ class Init extends NewsLetterPluginConfig
             "page_title" => $this->setup_page_title,
             "message" => $message,
             "send_grid_api_message" => $send_grid_api_message ? $send_grid_api_message : "",
+            "cron_command" => $this->server_cron_commands,
         ));
 
         return "";

@@ -44,10 +44,44 @@
         box-shadow: 0 1px 1px rgba(0,0,0,.04);
         margin: 5px 15px 2px;
         padding:10px 12px;
-        margin-top:200px;
+        margin-top:50px;
 
     }
 </style>
+
+<hr/>
+<div style="margin-top:100px">
+
+    <h4>Add a cron file into your server like this.</h4>
+    <table class="cron-command-table wp-list-table widefat striped table-view-list posts">
+        <tr>
+            <th><label>Minute</label></th>
+            <th><label>Hour</label></th>
+            <th><label>Day</label></th>
+            <th><label>Month</label></th>
+            <th><label>Weekday</label></th>
+            <th><label>Command</label></th>
+
+        </tr>
+        <tr>
+            <td>*/5</td>
+            <td>*</td>
+            <td>*</td>
+            <td>*</td>
+            <td>*</td>
+            <td>
+                {{cron_command}}
+            </td>
+        </tr>
+
+
+
+
+
+    </table>
+</div>
+
+
 
 <div class="sendgrid_api_message">
     <span style="font-weight: bold">Last SendGrid api response</span><br>

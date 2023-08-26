@@ -46,7 +46,7 @@ class NewsLetterPluginCronJob
                             if ($products){
                                 foreach ($products as $product){
 //                                $message_params['item_name'] = $product->post_title;
-                                    $product_link = home_url()."/product/".$product->post_name."/?date=".date("Y-m-d")."&email=".$post_data['post_title'];
+                                    $product_link = home_url()."/product/".$product->post_name."/?date=".wp_date("Y-m-d")."&email=".$post_data['post_title'];
                                     $message_params['item_name'] = "<a href='".$product_link."'>".$product->post_title."</a>";
                                 }
                             }
@@ -104,9 +104,11 @@ class NewsLetterPluginCronJob
 
         if($post_data[$config->post_meta_sending_frequency] == "one_time"){
             (new NewsLetterPluginAssistant())->update_post_meta($post_id,"cron",1);
+            $hook_name = "one_time_newsletter_cron_job_of_".$post_id;
+            wp_clear_scheduled_hook($hook_name,array($post_id));
         }
 
-        (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,date("Y-m-d H:i:s"));
+        (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,$assistant->current_time_stamp());
 
     }
 

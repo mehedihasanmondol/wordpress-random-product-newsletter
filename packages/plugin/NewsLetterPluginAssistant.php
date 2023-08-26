@@ -12,9 +12,14 @@ class NewsLetterPluginAssistant
         "Sunday",
         "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"
     ];
+
+    function current_time_stamp(){
+        return wp_date('Y-m-d H:i:s');
+    }
+
     function text_date_time($format="",$date_time=""){
         if (!$date_time){
-            $date_time = date("Y-m-d H:i:s");
+            $date_time = wp_date("Y-m-d H:i:s");
         }
         if (!$format){
             $format = "j M, Y g:i A";
@@ -67,7 +72,7 @@ class NewsLetterPluginAssistant
             $cron_time_meta = get_post_meta($post_id,$config_instance->post_meta_cron_time,true);
             if (!$cron_time_meta){
                 $this->update_post_meta($post_id,$config_instance->post_meta_cron,0);
-                $this->update_post_meta($post_id,$config_instance->post_meta_cron_time,date("Y-m-d H:i:s"));
+                $this->update_post_meta($post_id,$config_instance->post_meta_cron_time,$this->current_time_stamp());
             }
 
         }
@@ -111,7 +116,7 @@ class NewsLetterPluginAssistant
 
             if ($products){
                 foreach ($products as $product){
-                    $product_link = home_url()."/product/".$product->post_name."/?date=".date("Y-m-d")."&email=".$post_data['post_title'];
+                    $product_link = home_url()."/product/".$product->post_name."/?date=".wp_date("Y-m-d")."&email=".$post_data['post_title'];
                     $message_params['item_name'] = "<a href='".$product_link."'>".$product->post_title."</a>";
                 }
             }

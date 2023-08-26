@@ -230,6 +230,9 @@ function unsubscriber_install() {
 register_activation_hook( __FILE__, 'unsubscriber_install' );
 
 //
+
+//echo (new NewsLetterPluginAssistant())->text_date_time();
+
 //$timezone = wp_timezone();
 //echo $timezone->getName();
-////echo date("Y-m-d H:i:s");
+//echo date("Y-m-d H:i:s");
