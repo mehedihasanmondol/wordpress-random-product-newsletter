@@ -261,14 +261,15 @@ class Init extends NewsLetterPluginConfig
 
         $message = "";
 
-        if (isset($_REQUEST['post_id'])){
+        if (isset($_REQUEST['post_id']) && isset($_REQUEST['user_id']) ){
             (new NewsLetterUnSubscriber())->add_unsubscriber($_REQUEST['roll'],$_REQUEST['post_id'],$_REQUEST['user_id']);
 
+            $message = (new NewsLetterPluginConfig())->unsubscribe_message;
         }
 
         return $template_maker->render($html_form,array(
             "url" => get_home_url(),
-            "message" => (new NewsLetterPluginConfig())->unsubscribe_message,
+            "message" => $message
         ));
 
     }
@@ -283,9 +284,12 @@ class Init extends NewsLetterPluginConfig
     function modify_post_content($content) {
         // Check if it's a single post view
         if (is_single()) {
-            // Modify the post content as needed
+            if (isset($_REQUEST['post_id']) && isset($_REQUEST['user_id']) ){
+                // Modify the post content as needed
 //            $modified_content = '<h1>Here is new contentn </h1><div class="custom-content-wrapper">' . $content . '</div>';
-            return $this->setup_un_subscribe();
+                return $this->setup_un_subscribe();
+            }
+
         }
         return $content;
     }
