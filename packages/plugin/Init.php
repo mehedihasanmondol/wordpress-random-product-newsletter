@@ -114,7 +114,7 @@ class Init extends NewsLetterPluginConfig
                 $week_selectize .= "</select>";
                 
                 $date_selectize = "<select name='month_date'>";
-                for ($i=1; $i<=31; $i++){
+                for ($i=1; $i<=28; $i++){
                     $checked = "";
                     if ($post_data[$meta_keys['month_date']] == $i){
                         $checked = "selected";
