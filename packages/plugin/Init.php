@@ -220,11 +220,11 @@ class Init extends NewsLetterPluginConfig
 
         if (isset($_REQUEST['save'])){
             $update = update_option($this->send_grid_api_option,$_REQUEST['api_key']);
-            $update = update_option($this->send_grid_api_from_email,$_REQUEST['from_email']);
-            $update = update_option($this->send_grid_api_from_email_name,$_REQUEST['from_email_name']);
+            $update = update_option($this->send_grid_api_from_email_option,$_REQUEST['from_email']);
+            $update = update_option($this->send_grid_api_from_email_name_option,$_REQUEST['from_email_name']);
             $this->send_grid_api_key = get_option($this->send_grid_api_option);
-            $this->send_grid_api_from_email = get_option($this->send_grid_api_from_email);
-            $this->send_grid_api_from_email_name = get_option($this->send_grid_api_from_email_name);
+            $this->from_email = get_option($this->send_grid_api_from_email_option);
+            $this->from_email_name = get_option($this->send_grid_api_from_email_name_option);
             if ($update){
                 $message = (new NewsLetterPluginAssistant())->message_html_generate(array(
                     "message" => "Changed has been saved."
@@ -232,13 +232,13 @@ class Init extends NewsLetterPluginConfig
             }
         }
 
-        $send_grid_api_message = get_option($this->send_grid_api_message);
+        $send_grid_api_message = get_option($this->send_grid_api_message_option);
 
 
         echo $template_maker->render($html_form,array(
             "api_key" => $this->send_grid_api_key,
-            "from_email_name" => $this->send_grid_api_from_email_name,
-            "from_email" => $this->send_grid_api_from_email,
+            "from_email_name" => $this->from_email_name,
+            "from_email" => $this->from_email,
             "page_title" => $this->setup_page_title,
             "message" => $message,
             "send_grid_api_message" => $send_grid_api_message ? $send_grid_api_message : "",

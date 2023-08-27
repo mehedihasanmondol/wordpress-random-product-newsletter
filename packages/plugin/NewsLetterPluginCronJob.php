@@ -73,7 +73,7 @@ class NewsLetterPluginCronJob
                                     $error_message .= $error['message'];
                                 }
 
-                                update_option($config->send_grid_api_message,$error_message." at ".$assistant->text_date_time(),'no');
+                                update_option($config->send_grid_api_message_option,$error_message." at ".$assistant->text_date_time(),'no');
 
                             }
 
@@ -93,7 +93,7 @@ class NewsLetterPluginCronJob
 
 //                        return $response->statusCode();
                         } catch (Exception $e) {
-                            update_option($config->send_grid_api_message,$e->getMessage()." at ".$assistant->text_date_time(),'no');
+                            update_option($config->send_grid_api_message_option,$e->getMessage()." at ".$assistant->text_date_time(),'no');
                         }
                     }
                 }

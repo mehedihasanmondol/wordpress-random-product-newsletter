@@ -27,9 +27,9 @@ class NewsLetterPluginConfig
     public $from_email_name = "Developer Mehedi hasan";
 
     public $send_grid_api_option = "send_grid_api_key";
-    public $send_grid_api_from_email = "send_grid_from_email";
-    public $send_grid_api_from_email_name = "send_grid_from_email_name";
-    public $send_grid_api_message = "send_grid_api_message";
+    public $send_grid_api_from_email_option = "send_grid_from_email";
+    public $send_grid_api_from_email_name_option = "send_grid_from_email_name";
+    public $send_grid_api_message_option = "send_grid_api_message";
 
     public $unsubscriber_table_name = "unsubscribers";
 
@@ -69,13 +69,13 @@ class NewsLetterPluginConfig
     {
 
         $this->server_cron_commands = "wget -q -O - ".home_url()."/wp-cron.php?doing_wp_cron >/dev/null 2>&1";
-
         $key = get_option($this->send_grid_api_option);
-        $from_email = get_option($this->send_grid_api_from_email);
-        $from_email_name = get_option($this->send_grid_api_from_email_name);
+        $from_email = get_option($this->send_grid_api_from_email_option);
+        $from_email_name = get_option($this->send_grid_api_from_email_name_option);
+
         $this->send_grid_api_key =  $key ? $key : $this->send_grid_api_key;
-        $this->send_grid_api_from_email =  $from_email ? $from_email : $this->send_grid_api_from_email;
-        $this->send_grid_api_from_email_name =  $from_email_name ? $from_email_name : $this->send_grid_api_from_email_name;
+        $this->from_email =  $from_email ? $from_email : $this->from_email;
+        $this->from_email_name =  $from_email_name ? $from_email_name : $this->from_email_name;
 
 
 

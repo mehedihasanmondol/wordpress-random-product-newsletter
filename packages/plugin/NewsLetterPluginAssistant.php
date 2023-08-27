@@ -150,11 +150,11 @@ class NewsLetterPluginAssistant
                         $error_message .= $error['message'];
                     }
 
-                    update_option($config->send_grid_api_message,$error_message." at ".$this->text_date_time(),'no');
+                    update_option($config->send_grid_api_message_option,$error_message." at ".$this->text_date_time(),'no');
 
                 }
             }catch (Exception $exception){
-                update_option($config->send_grid_api_message,$exception->getMessage()." at ".$this->text_date_time(),'no');
+                update_option($config->send_grid_api_message_option,$exception->getMessage()." at ".$this->text_date_time(),'no');
             }
 
 
