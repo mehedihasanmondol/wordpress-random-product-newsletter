@@ -133,7 +133,7 @@ class NewsLetterPluginCronJob
                     if ( ! wp_next_scheduled( $hook_name ,$args) ) {
 //                        $time = $assistant->text_date_time("Y-m-d",$post[$config->post_meta_cron_time])." 22:01:01";
 //                        $time = $assistant->text_date_time("Y-m-d",$post[$config->post_meta_cron_time])." 00:00:01";
-                        wp_schedule_single_event(strtotime($post[$config->post_meta_cron_time]), $hook_name,$args);
+                        wp_schedule_single_event(time()+60, $hook_name,$args);
                     }
                 }
 
