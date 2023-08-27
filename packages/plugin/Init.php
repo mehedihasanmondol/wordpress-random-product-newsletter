@@ -30,8 +30,8 @@ class Init extends NewsLetterPluginConfig
         new WPEditorToolConfig();
         $settings = array(
             'tinymce' => array(
-                'toolbar1' => 'bold,italic,strikethrough,link,unlink,block quote,horizontal line,bullet list,numbered list,align left,align center,align right,undo,redo,fullscreen toggle,toolbar toggle,custom_button', // Add your custom button here
-                'plugins' => 'custom_tinymce_plugin', // Add your custom TinyMCE plugin name here
+                'toolbar1' => 'bold,italic,underline,separator,numlist,bullist,forecolor,backcolor,image,hr,alignleft,aligncenter,alignright,separator,link,unlink,undo,redo,blockquote,spellchecker,fullscreen,custom_button', // Add your custom button here
+                'plugins' => 'custom_tinymce_plugin,lists,link,fullscreen,textcolor,image,hr', // Add your custom TinyMCE plugin name here
             ),
         );
 
