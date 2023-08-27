@@ -39,15 +39,9 @@ class Init extends NewsLetterPluginConfig
             'textarea_name' => $field_name, // Name of the textarea field
             'media_buttons' => true, // Show media buttons
             'textarea_rows' => 15, // Number of rows in the editor
-//            'teeny' => true, // Use a minimal editor
         ));
 
-//        wp_editor($content, 'newsletter_body', array(
-//            'textarea_name' => $field_name, // Name of the textarea field
-//            'media_buttons' => true, // Show media buttons
-//            'textarea_rows' => 15, // Number of rows in the editor
-//            'teeny' => true, // Use a minimal editor
-//        ));
+
 
         wp_editor($content, 'newsletter_body', $settings);
 

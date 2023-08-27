@@ -2,7 +2,7 @@
     tinymce.PluginManager.add('custom_tinymce_plugin', function(editor, url) {
         editor.addButton('custom_button', {
             type: 'listbox',
-            text: 'Select Option',
+            text: 'Select wildcards',
             icon: false,
             onselect: function(e) {
                 var value = this.value();
