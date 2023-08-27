@@ -7,9 +7,6 @@ define("NEWS_LETTER_PLUGIN_DIR",__DIR__);
 define("NEWS_LETTER_PLUGIN_DIR_URL",plugin_dir_url(__FILE__));
 
 new Init();
-new DummyUserCategoryRegister();
-(new NewsLetterPluginCronJob())->register_cron_jobs();
-
 
 global $unsubscriber_table_version;
 $unsubscriber_table_version = '1.1';
