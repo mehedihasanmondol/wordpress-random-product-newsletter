@@ -35,4 +35,6 @@ function unsubscriber_install() {
 }
 
 register_activation_hook( __FILE__, 'unsubscriber_install' );
+register_deactivation_hook( __FILE__, [(new NewsLetterPluginCronJob()),"un_register_cron_jobs"] );
+
 
