@@ -17,6 +17,18 @@ class NewsLetterPluginAssistant
         return wp_date('Y-m-d H:i:s');
     }
 
+    function time_convert_by_zone($time, $tz = 'UTC',$otz="")
+    {
+        // create a $dt object with the default timezone
+        $dt = new DateTime($time, new DateTimeZone($otz ? $otz : date_default_timezone_get()));
+
+        // change the timezone of the object without changing it's time
+        $dt->setTimezone(new DateTimeZone($tz));
+
+        // format the datetime
+        return $dt->format('Y-m-d H:i:s');
+    }
+
     function text_date_time($format="",$date_time=""){
         if (!$date_time){
             $date_time = wp_date("Y-m-d H:i:s");

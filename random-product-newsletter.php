@@ -35,3 +35,12 @@ function unsubscriber_install() {
 }
 
 register_activation_hook( __FILE__, 'unsubscriber_install' );
+
+
+//$timezone = wp_timezone();
+//echo $timezone->getName();
+//
+//
+//$current_time = (new NewsLetterPluginAssistant())->current_time_stamp();
+//echo $current_time."<br>";
+//echo (new NewsLetterPluginAssistant())->time_convert_by_zone($current_time,"UTC",wp_timezone()->getName());

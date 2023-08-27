@@ -119,15 +119,20 @@ class NewsLetterPluginCronJob
     function register_cron_jobs(){
         $config = new NewsLetterPluginConfig();
         $posts = get_posts(array(
-            "post_type" => $config->post_type
+            "post_type" => $config->post_type,
+            "numberposts" => -1,
+            "meta_key" => 'cron',
+            "meta_value" => 0,
         ));
+
+
 
         $assistant = new NewsLetterPluginAssistant();
 
         foreach ($posts as $post_object){
+
             $post = $assistant->get_post_data($post_object->ID);
             $post_id = $post_object->ID;
-
 
             if ($post[$config->post_meta_test_mode] == 'live'){
                 if ($post[$config->post_meta_sending_frequency] == "one_time" and !$post[$config->post_meta_cron]){
@@ -145,8 +150,10 @@ class NewsLetterPluginCronJob
                     $hook_name = "weekly_newsletter_cron_job_of_".$post_id;
                     $args = array($post_id);
                     add_action($hook_name,[$this,"set_cron_job"],10,$args);
+
                     if ( ! wp_next_scheduled( $hook_name ,$args) ) {
-                        $time = strtotime('next '.$assistant->days[$post[$config->post_meta_week_day]].' 01:00:00',strtotime($post[$config->post_meta_cron_time]));
+                        $utc_cron_time = (new NewsLetterPluginAssistant())->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
+                        $time = strtotime('next '.$assistant->days[$post[$config->post_meta_week_day]].' 01:00:00',strtotime($utc_cron_time));
                         wp_schedule_single_event($time, $hook_name,$args);
                     }
                 }
@@ -154,8 +161,11 @@ class NewsLetterPluginCronJob
                     $hook_name = "monthly_newsletter_cron_job_of_".$post_id;
                     $args = array($post_id);
                     add_action($hook_name,[$this,"set_cron_job"],10,$args);
+
                     if ( ! wp_next_scheduled( $hook_name ,$args) ) {
-                        $time = strtotime($assistant->text_date_time("Y-m-",$post[$config->post_meta_cron_time]).$post[$config->post_meta_month_date]);
+                        $utc_cron_time = (new NewsLetterPluginAssistant())->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
+                        $month_date = $assistant->text_date_time("Y-m-",$utc_cron_time).$post[$config->post_meta_month_date];
+                        $time = strtotime($month_date." 01:00:00");
                         wp_schedule_single_event($time, $hook_name,$args);
                     }
                 }
