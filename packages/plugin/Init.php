@@ -15,7 +15,7 @@ class Init extends NewsLetterPluginConfig
         add_action("init",[$this,"create_newsletter_post"]);
         add_action("admin_menu",[$this,"add_setup_menu"]);
         add_filter( 'cron_schedules', [(new NewsLetterPluginCronJob()),"add_schedule_intervals"] );
-        add_filter( 'cron_schedules', [(new NewsLetterPluginCronJob()),"register_cron_jobs"] );
+        add_filter( 'init', [(new NewsLetterPluginCronJob()),"register_cron_jobs"] );
 
     }
     function load_newsletter_script(){
