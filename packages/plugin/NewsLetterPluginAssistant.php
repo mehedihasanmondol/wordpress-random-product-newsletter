@@ -153,6 +153,11 @@ class NewsLetterPluginAssistant
                     update_option($config->send_grid_api_message_option,$error_message." at ".$this->text_date_time(),'no');
 
                 }
+                else{
+                    update_option($config->send_grid_api_message_option, "Mail send in ".$email_address." at ". $this->text_date_time(),'no');
+
+                }
+                
             }catch (Exception $exception){
                 update_option($config->send_grid_api_message_option,$exception->getMessage()." at ".$this->text_date_time(),'no');
             }

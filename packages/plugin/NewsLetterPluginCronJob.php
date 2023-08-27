@@ -76,6 +76,10 @@ class NewsLetterPluginCronJob
                                 update_option($config->send_grid_api_message_option,$error_message." at ".$assistant->text_date_time(),'no');
 
                             }
+                            else{
+                                update_option($config->send_grid_api_message_option, "Mail send in ".$user->user_email." at ". $this->text_date_time(),'no');
+
+                            }
 
 //                        $result_data = array(
 //                            "from_email" => $config->from_email,
