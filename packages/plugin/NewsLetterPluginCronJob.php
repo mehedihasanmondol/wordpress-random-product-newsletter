@@ -111,8 +111,14 @@ class NewsLetterPluginCronJob
             $hook_name = "one_time_newsletter_cron_job_of_".$post_id;
             wp_clear_scheduled_hook($hook_name,array($post_id));
         }
+        $cron_time = $assistant->current_time_stamp();
 
-        (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,$assistant->current_time_stamp());
+        if($post_data[$config->post_meta_sending_frequency] == "monthly"){
+            $month_time = $assistant->text_date_time("Y-m-",$post_data[(new NewsLetterPluginConfig())->post_meta_cron_time])."01 ".wp_date("H:i:s");
+            $cron_time = date("Y-m-d H:i:s",strtotime('+1 months',strtotime($month_time)));
+        }
+
+        (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,$cron_time);
 
     }
 
