@@ -83,9 +83,11 @@ class NewsLetterPluginAssistant
         if (isset($_POST[$config_instance->post_meta_api_key])){
             $cron_time_meta = get_post_meta($post_id,$config_instance->post_meta_cron_time,true);
             if (!$cron_time_meta){
-                $this->update_post_meta($post_id,$config_instance->post_meta_cron,0);
                 $this->update_post_meta($post_id,$config_instance->post_meta_cron_time,$this->current_time_stamp());
+                $this->update_post_meta($post_id,$config_instance->post_meta_cron_running,0);
             }
+
+            $this->update_post_meta($post_id,$config_instance->post_meta_cron,0);
 
         }
 

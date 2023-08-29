@@ -10,6 +10,7 @@ class NewsLetterPluginCronJob
 {
     function set_cron_job($post_id){
 
+        set_time_limit(0);
         $config = new NewsLetterPluginConfig();
         $assistant = new NewsLetterPluginAssistant();
         $unsubscriber = new NewsLetterUnSubscriber();
@@ -18,6 +19,8 @@ class NewsLetterPluginCronJob
                 return $value;
             }
         ));
+
+        $assistant->update_post_meta($post_id,$config->post_meta_cron_running,1);
 
 
         $post_data = $assistant->get_post_data($post_id);
@@ -66,7 +69,7 @@ class NewsLetterPluginCronJob
 //                                $message_params['item_name'] = $product->post_title;
                                     $product_link = home_url()."/product/".$product->post_name."/?date=".wp_date("Y-m-d")."&email=".$post_data['post_title'];
                                     $message_params['item_name'] = "<a href='".$product_link."'>".$product->post_title."</a>";
-                                    $message_params['item_image'] = "<a href='".$product_link."'>".$assistant->get_post_image($post_id)."</a>";
+                                    $message_params['item_image'] = "<a href='".$product_link."'>".$assistant->get_post_image($product->ID)."</a>";
                                 }
                             }
 
@@ -100,21 +103,6 @@ class NewsLetterPluginCronJob
 
                             }
 
-//                        $result_data = array(
-//                            "from_email" => $config->from_email,
-//                            "from_email_name" => $config->from_email_name,
-//                            "subject" => $post_data[$config->post_meta_subject],
-//                            "to_email" => $user->user_email,
-//                            "to_name" => $user->display_name,
-//                            "message" => $message,
-//                            "api_key" => $post_data[$config->post_meta_api_key],
-//                            "status" => $response->statusCode(),
-//                        );
-
-
-//                        $assistant->update_post_meta($post_id,$config->post_meta_cron_status,json_encode($result_data));
-
-//                        return $response->statusCode();
                         } catch (Exception $e) {
                             update_option($config->send_grid_api_message_option,$e->getMessage()." at ".$assistant->text_date_time(),'no');
                         }
@@ -126,18 +114,19 @@ class NewsLetterPluginCronJob
         }
 
         if($post_data[$config->post_meta_sending_frequency] == "one_time"){
-            (new NewsLetterPluginAssistant())->update_post_meta($post_id,"cron",1);
+            $assistant->update_post_meta($post_id,"cron",1);
             $hook_name = "one_time_newsletter_cron_job_of_".$post_id;
             wp_clear_scheduled_hook($hook_name,array($post_id));
         }
         $cron_time = $assistant->current_time_stamp();
 
         if($post_data[$config->post_meta_sending_frequency] == "monthly"){
-            $month_time = $assistant->text_date_time("Y-m-",$post_data[(new NewsLetterPluginConfig())->post_meta_cron_time])."01 ".wp_date("H:i:s");
+            $month_time = $assistant->text_date_time("Y-m-",$post_data[$config->post_meta_cron_time])."01 ".wp_date("H:i:s");
             $cron_time = date("Y-m-d H:i:s",strtotime('+1 months',strtotime($month_time)));
         }
 
-        (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,$cron_time);
+        $assistant->update_post_meta($post_id,$config->post_meta_cron_time,$cron_time);
+        $assistant->update_post_meta($post_id,$config->post_meta_cron_running,0);
 
     }
 
@@ -159,34 +148,33 @@ class NewsLetterPluginCronJob
             $post = $assistant->get_post_data($post_object->ID);
             $post_id = $post_object->ID;
 
-            if ($post[$config->post_meta_sending_frequency] == "one_time" and !$post[$config->post_meta_cron]){
+            if ($post[$config->post_meta_sending_frequency] == "one_time" and !$post[$config->post_meta_cron] and !$post[$config->post_meta_cron_running]){
                 $hook_name = "one_time_newsletter_cron_job_of_".$post_id;
                 $args = array($post_id);
                 add_action($hook_name,[$this,"set_cron_job"],10,$args);
                 if ( ! wp_next_scheduled( $hook_name ,$args) ) {
-//                        $time = $assistant->text_date_time("Y-m-d",$post[$config->post_meta_cron_time])." 22:01:01";
-//                        $time = $assistant->text_date_time("Y-m-d",$post[$config->post_meta_cron_time])." 00:00:01";
                     wp_schedule_single_event(time(), $hook_name,$args);
                 }
             }
-            else if ($post[$config->post_meta_sending_frequency] == "hourly" and !$post[$config->post_meta_cron]){
+            else if ($post[$config->post_meta_sending_frequency] == "hourly" and !$post[$config->post_meta_cron] and !$post[$config->post_meta_cron_running]){
                 $hook_name = "hourly_newsletter_cron_job_of_".$post_id;
                 $args = array($post_id);
                 add_action($hook_name,[$this,"set_cron_job"],10,$args);
 
-                $utc_cron_time = (new NewsLetterPluginAssistant())->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
+                $utc_cron_time = $assistant->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
                 $time = strtotime('+'.$post[$config->post_meta_hour]." hour",strtotime($utc_cron_time));
 
                 if (!wp_next_scheduled($hook_name, $args)) {
                     wp_schedule_single_event($time, $hook_name, $args);
+
                 }
             }
-            else if ($post[$config->post_meta_sending_frequency] == "weekly" and !$post[$config->post_meta_cron]){
+            else if ($post[$config->post_meta_sending_frequency] == "weekly" and !$post[$config->post_meta_cron] and !$post[$config->post_meta_cron_running]){
                 $hook_name = "weekly_newsletter_cron_job_of_".$post_id;
                 $args = array($post_id);
                 add_action($hook_name,[$this,"set_cron_job"],10,$args);
 
-                $utc_cron_time = (new NewsLetterPluginAssistant())->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
+                $utc_cron_time = $assistant->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
                 $time = strtotime('next '.$assistant->days[$post[$config->post_meta_week_day]].' 01:00:00',strtotime($utc_cron_time));
 
                 if (date("Y-m-d",$time) >= date("Y-m-d")) {
@@ -196,17 +184,17 @@ class NewsLetterPluginCronJob
                 }
                 else{
                     $cron_time = $assistant->current_time_stamp();
-                    (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,$cron_time);
+                    $assistant->update_post_meta($post_id,$config->post_meta_cron_time,$cron_time);
 
                 }
             }
 
-            else if ($post[$config->post_meta_sending_frequency] == "monthly" and !$post[$config->post_meta_cron]){
+            else if ($post[$config->post_meta_sending_frequency] == "monthly" and !$post[$config->post_meta_cron] and !$post[$config->post_meta_cron_running]){
                 $hook_name = "monthly_newsletter_cron_job_of_".$post_id;
                 $args = array($post_id);
                 add_action($hook_name,[$this,"set_cron_job"],10,$args);
 
-                $utc_cron_time = (new NewsLetterPluginAssistant())->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
+                $utc_cron_time = $assistant->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
                 $month_date = $assistant->text_date_time("Y-m-",$utc_cron_time).$post[$config->post_meta_month_date];
                 $time = strtotime($month_date." 01:00:00");
 
@@ -217,7 +205,7 @@ class NewsLetterPluginCronJob
                 }
                 else{
                     $cron_time = date("Y-m-d H:i:s",strtotime('+1 months',strtotime(date("Y-m-01 H:i:s"))));
-                    (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,$cron_time);
+                    $assistant->update_post_meta($post_id,$config->post_meta_cron_time,$cron_time);
 
                 }
 

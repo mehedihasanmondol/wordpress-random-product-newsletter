@@ -53,6 +53,7 @@ class NewsLetterPluginConfig
         "test_email_2" => 'test_email_2',
         "from_email" => 'from_email',
         "from_email_name" => 'from_email_name',
+        "cron_running" => 'cron_running',
     );
 
     public $post_meta_api_key;
@@ -71,6 +72,7 @@ class NewsLetterPluginConfig
     public $post_meta_test_email_2;
     public $post_meta_from_email;
     public $post_meta_from_email_name;
+    public $post_meta_cron_running;
     public function __construct()
     {
 
@@ -102,6 +104,7 @@ class NewsLetterPluginConfig
         $this->post_meta_test_email_2 = $this->post_meta_keys['test_email_2'];
         $this->post_meta_from_email = $this->post_meta_keys['from_email'];
         $this->post_meta_from_email_name = $this->post_meta_keys['from_email_name'];
+        $this->post_meta_cron_running = $this->post_meta_keys['cron_running'];
     }
 
 }
