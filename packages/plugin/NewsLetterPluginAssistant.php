@@ -213,6 +213,10 @@ class NewsLetterPluginAssistant
             if ($key == (new NewsLetterPluginConfig())->post_meta_cron){
                 $data[$key] = $data[$key] ? $data[$key] : 0;
             }
+             if ($key == (new NewsLetterPluginConfig())->post_meta_hour){
+                $data[$key] = $data[$key] ? $data[$key] : 0;
+            }
+
 
             if ($key == (new NewsLetterPluginConfig())->post_meta_test_mode){
                 $data[$key] = $data[$key] ? $data[$key] : 'test';
@@ -265,5 +269,12 @@ class NewsLetterPluginAssistant
         return $template_maker->render($html_form,$data);
 
     }
+
+    function get_default_email_html($data=array()){
+        return file_get_contents(NEWS_LETTER_PLUGIN_DIR."/assets/html/default-email-template.html");
+
+
+    }
+
 
 }

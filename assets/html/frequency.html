@@ -7,6 +7,14 @@
         </td>
     </tr>
     <tr>
+        <th><label for="hourly">Hourly </label><input {{hourly_checked}} id="hourly" type="radio" name="newsletter_sending_frequency" value="hourly"></th>
+        <td>:</td>
+        <td>
+            <input type="number" class="" name="hour" value="{{hour}}"/>
+        </td>
+    </tr>
+
+    <tr>
         <th><label for="weekly">Weekly </label><input {{weekly_checked}} id="weekly" type="radio" name="newsletter_sending_frequency" value="weekly"></th>
         <td>:</td>
         <td>

@@ -66,12 +66,24 @@ class Init extends NewsLetterPluginConfig
                 echo "<input class='regular-text' value='".$post_data[$meta_keys['api_key']]."' name='".$meta_keys['api_key']."' style='width:100%' type='text' placeholder='SendGrid API key'/>";
             },$this->post_type);
 
+            add_meta_box($meta_keys['from_email'],"From email",function () use ($meta_keys,$post_data){
+                echo "<input class='regular-text' value='".$post_data[$meta_keys['from_email']]."' name='".$meta_keys['from_email']."' style='width:100%' type='text' placeholder='From email'/>";
+            },$this->post_type);
+
+            add_meta_box($meta_keys['from_email_name'],"From name",function () use ($meta_keys,$post_data){
+                echo "<input class='regular-text' value='".$post_data[$meta_keys['from_email_name']]."' name='".$meta_keys['from_email_name']."' style='width:100%' type='text' placeholder='From name'/>";
+            },$this->post_type);
+
+
+
+
             add_meta_box($meta_keys['subject'],"Subject",function () use ($meta_keys,$post_data){
                 echo "<input class='regular-text' value='".$post_data[$meta_keys['subject']]."' name='".$meta_keys['subject']."' style='width:100%' type='text' placeholder='subject'/>";
             },$this->post_type);
 
             add_meta_box($meta_keys['body'],"Body",function () use ($meta_keys,$post_data){
-                $this->custom_text_editor_meta_box_callback($meta_keys['body'],$post_data[$meta_keys['body']]);
+                $body = $post_data[$meta_keys['body']] ? $post_data[$meta_keys['body']] : (new NewsLetterPluginAssistant())->get_default_email_html();
+                $this->custom_text_editor_meta_box_callback($meta_keys['body'],$body);
             },$this->post_type);
 
             add_meta_box($meta_keys['user_categories'],"Send to",function () use ($meta_keys,$post_data){
@@ -101,6 +113,8 @@ class Init extends NewsLetterPluginConfig
                     "one_time_checked" => "",
                     "weekly_checked" => "",
                     "monthly_checked" => "",
+                    "hourly_checked" => "",
+                    "hour" => $post_data[$meta_keys['hour']] ? $post_data[$meta_keys['hour']] : 1,
                 );
                 $week_selectize = "<select name='week_day'>";
 
@@ -122,6 +136,8 @@ class Init extends NewsLetterPluginConfig
                     $date_selectize .= "<option $checked value='".$i."'>".$i."</option>";
                 }
                 $date_selectize .= "</select>";
+
+
 
                 $checked_data[$value."_checked"] = "checked";
                 if (!$value){

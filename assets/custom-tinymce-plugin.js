@@ -13,7 +13,7 @@
             values: [
                 { text: 'User name', value: '{{user_name}}' },
                 { text: 'Item name', value: '{{item_name}}' },
-                // { text: 'Item image', value: '{{item_image}}' },
+                { text: 'Item image', value: '{{item_image}}' },
                 // { text: 'Item link', value: '{{item_link}}' }
             ]
         });

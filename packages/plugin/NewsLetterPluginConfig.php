@@ -44,12 +44,15 @@ class NewsLetterPluginConfig
         "sending_frequency" => "newsletter_sending_frequency",
         "week_day" => "week_day",
         "month_date" => "month_date",
+        "hour" => "hour",
         "cron" => 'cron',
         "cron_time" => 'cron_time',
         "cron_status" => 'cron_status',
         "test_mode" => 'test_mode',
         "test_email_1" => 'test_email_1',
         "test_email_2" => 'test_email_2',
+        "from_email" => 'from_email',
+        "from_email_name" => 'from_email_name',
     );
 
     public $post_meta_api_key;
@@ -59,12 +62,15 @@ class NewsLetterPluginConfig
     public $post_meta_sending_frequency;
     public $post_meta_week_day;
     public $post_meta_month_date;
+    public $post_meta_hour;
     public $post_meta_cron;
     public $post_meta_cron_time;
     public $post_meta_cron_status;
     public $post_meta_test_mode;
     public $post_meta_test_email_1;
     public $post_meta_test_email_2;
+    public $post_meta_from_email;
+    public $post_meta_from_email_name;
     public function __construct()
     {
 
@@ -87,12 +93,15 @@ class NewsLetterPluginConfig
         $this->post_meta_sending_frequency = $this->post_meta_keys['sending_frequency'];
         $this->post_meta_week_day = $this->post_meta_keys['week_day'];
         $this->post_meta_month_date = $this->post_meta_keys['month_date'];
+        $this->post_meta_hour = $this->post_meta_keys['hour'];
         $this->post_meta_cron = $this->post_meta_keys['cron'];
         $this->post_meta_cron_time = $this->post_meta_keys['cron_time'];
         $this->post_meta_cron_status = $this->post_meta_keys['cron_status'];
         $this->post_meta_test_mode = $this->post_meta_keys['test_mode'];
         $this->post_meta_test_email_1 = $this->post_meta_keys['test_email_1'];
         $this->post_meta_test_email_2 = $this->post_meta_keys['test_email_2'];
+        $this->post_meta_from_email = $this->post_meta_keys['from_email'];
+        $this->post_meta_from_email_name = $this->post_meta_keys['from_email_name'];
     }
 
 }
