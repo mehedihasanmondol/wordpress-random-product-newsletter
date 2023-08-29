@@ -101,13 +101,13 @@ class NewsLetterPluginAssistant
             }
         }
 
-        if (isset($_POST[$config_instance->post_meta_api_key])){
-            $test_mode = get_post_meta($post_id,$config_instance->post_meta_test_mode,true);
-            if ($test_mode == "test"){
-                $this->send_test_mail($post_id,get_post_meta($post_id,$config_instance->post_meta_test_email_1,true));
-                $this->send_test_mail($post_id,get_post_meta($post_id,$config_instance->post_meta_test_email_2,true));
-            }
-        }
+//        if (isset($_POST[$config_instance->post_meta_api_key])){
+//            $test_mode = get_post_meta($post_id,$config_instance->post_meta_test_mode,true);
+//            if ($test_mode == "test"){
+//                $this->send_test_mail($post_id,get_post_meta($post_id,$config_instance->post_meta_test_email_1,true));
+//                $this->send_test_mail($post_id,get_post_meta($post_id,$config_instance->post_meta_test_email_2,true));
+//            }
+//        }
     }
 
     function send_test_mail($post_id,$email_address){
@@ -185,7 +185,8 @@ class NewsLetterPluginAssistant
         update_post_meta($post_id, $key, $value);
     }
     function get_post_data($post_id){
-        $meta_keys = (new NewsLetterPluginConfig())->post_meta_keys;
+        $config = new NewsLetterPluginConfig();
+        $meta_keys = $config->post_meta_keys;
         $data = array(
             "post_date" => "",
             "post_title" => "",
@@ -204,21 +205,27 @@ class NewsLetterPluginAssistant
             $value = get_post_meta($post_id,$key,true);
             $data[$key] = $value ? $value : "";
 
-            if ($key == (new NewsLetterPluginConfig())->post_meta_api_key){
-                $data[$key] = $data[$key] ? $data[$key] : (new NewsLetterPluginConfig())->send_grid_api_key;
+            if ($key == $config->post_meta_api_key){
+                $data[$key] = $data[$key] ? $data[$key] : $config->send_grid_api_key;
             }
-            if ($key == (new NewsLetterPluginConfig())->post_meta_week_day){
-                $data[$key] = $data[$key] ? $data[$key] : 0;
+            elseif ($key == $config->post_meta_from_email){
+                $data[$key] = $data[$key] ? $data[$key] : $config->from_email;
             }
-            if ($key == (new NewsLetterPluginConfig())->post_meta_cron){
-                $data[$key] = $data[$key] ? $data[$key] : 0;
-            }
-             if ($key == (new NewsLetterPluginConfig())->post_meta_hour){
-                $data[$key] = $data[$key] ? $data[$key] : 0;
+            elseif ($key == $config->post_meta_from_email_name){
+                $data[$key] = $data[$key] ? $data[$key] : $config->from_email_name;
             }
 
 
-            if ($key == (new NewsLetterPluginConfig())->post_meta_test_mode){
+            elseif ($key == $config->post_meta_week_day){
+                $data[$key] = $data[$key] ? $data[$key] : 0;
+            }
+            elseif ($key == $config->post_meta_cron){
+                $data[$key] = $data[$key] ? $data[$key] : 0;
+            }
+            elseif ($key == $config->post_meta_hour){
+                $data[$key] = $data[$key] ? $data[$key] : 0;
+            }
+            elseif ($key == $config->post_meta_test_mode){
                 $data[$key] = $data[$key] ? $data[$key] : 'test';
             }
 
@@ -259,6 +266,9 @@ class NewsLetterPluginAssistant
         return get_users( $args );
     }
 
+    function get_post_image($post_id){
+        return "<img src='". get_the_post_thumbnail_url($post_id, 'post-thumbnail')."'/>";
+    }
     function get_unsubscribe_button_html($data=array()){
         $html_form = file_get_contents(NEWS_LETTER_PLUGIN_DIR."/assets/html/unsubscribe-button.html");
         $template_maker = new Mustache_Engine(array(

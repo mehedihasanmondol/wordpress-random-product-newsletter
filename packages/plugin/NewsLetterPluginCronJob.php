@@ -23,8 +23,26 @@ class NewsLetterPluginCronJob
         $post_data = $assistant->get_post_data($post_id);
         $user_roles = explode(",",$post_data[(new NewsLetterPluginConfig())->post_meta_user_categories]);
 
+        if ($post_data[$config->post_meta_test_mode] == 'test'){
+            $user_roles = array('cron_test');
+
+        }
+
         foreach($user_roles as $role){
-            $users = $assistant->get_users_by_roll($role);
+            $users = array();
+            if ($role == 'cron_test'){
+                $users = array();
+                foreach (array($post_data[$config->post_meta_test_email_1],$post_data[$config->post_meta_test_email_2]) as $email){
+                    $test_user = new stdClass();
+                    $test_user->id = 0;
+                    $test_user->display_name = "Test user 1";
+                    $test_user->user_email = $email;
+                    $users[] = $test_user;
+                }
+            }
+            else{
+                $users = $assistant->get_users_by_roll($role);
+            }
 
             foreach ($users as $user){
 
@@ -36,7 +54,7 @@ class NewsLetterPluginCronJob
                             $message_params = array(
                                 "user_name" => $user->display_name,
                                 "item_name" => "",
-//                            "item_image" => "",
+                                "item_image" => "",
 //                            "item_link" => "",
                             );
 
@@ -48,6 +66,7 @@ class NewsLetterPluginCronJob
 //                                $message_params['item_name'] = $product->post_title;
                                     $product_link = home_url()."/product/".$product->post_name."/?date=".wp_date("Y-m-d")."&email=".$post_data['post_title'];
                                     $message_params['item_name'] = "<a href='".$product_link."'>".$product->post_title."</a>";
+                                    $message_params['item_image'] = "<a href='".$product_link."'>".$assistant->get_post_image($post_id)."</a>";
                                 }
                             }
 
@@ -77,7 +96,7 @@ class NewsLetterPluginCronJob
 
                             }
                             else{
-                                update_option($config->send_grid_api_message_option, "Mail send in ".$user->user_email." at ". $this->text_date_time(),'no');
+                                update_option($config->send_grid_api_message_option, "Mail send in ".$user->user_email." at ". $assistant->text_date_time(),'no');
 
                             }
 
@@ -140,64 +159,71 @@ class NewsLetterPluginCronJob
             $post = $assistant->get_post_data($post_object->ID);
             $post_id = $post_object->ID;
 
-            if ($post[$config->post_meta_test_mode] == 'live'){
-                if ($post[$config->post_meta_sending_frequency] == "one_time" and !$post[$config->post_meta_cron]){
-                    $hook_name = "one_time_newsletter_cron_job_of_".$post_id;
-                    $args = array($post_id);
-                    add_action($hook_name,[$this,"set_cron_job"],10,$args);
-                    if ( ! wp_next_scheduled( $hook_name ,$args) ) {
+            if ($post[$config->post_meta_sending_frequency] == "one_time" and !$post[$config->post_meta_cron]){
+                $hook_name = "one_time_newsletter_cron_job_of_".$post_id;
+                $args = array($post_id);
+                add_action($hook_name,[$this,"set_cron_job"],10,$args);
+                if ( ! wp_next_scheduled( $hook_name ,$args) ) {
 //                        $time = $assistant->text_date_time("Y-m-d",$post[$config->post_meta_cron_time])." 22:01:01";
 //                        $time = $assistant->text_date_time("Y-m-d",$post[$config->post_meta_cron_time])." 00:00:01";
-                        wp_schedule_single_event(time()+60, $hook_name,$args);
+                    wp_schedule_single_event(time(), $hook_name,$args);
+                }
+            }
+            else if ($post[$config->post_meta_sending_frequency] == "hourly" and !$post[$config->post_meta_cron]){
+                $hook_name = "hourly_newsletter_cron_job_of_".$post_id;
+                $args = array($post_id);
+                add_action($hook_name,[$this,"set_cron_job"],10,$args);
+
+                $utc_cron_time = (new NewsLetterPluginAssistant())->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
+                $time = strtotime('+'.$post[$config->post_meta_hour]." hour",strtotime($utc_cron_time));
+
+                if (!wp_next_scheduled($hook_name, $args)) {
+                    wp_schedule_single_event($time, $hook_name, $args);
+                }
+            }
+            else if ($post[$config->post_meta_sending_frequency] == "weekly" and !$post[$config->post_meta_cron]){
+                $hook_name = "weekly_newsletter_cron_job_of_".$post_id;
+                $args = array($post_id);
+                add_action($hook_name,[$this,"set_cron_job"],10,$args);
+
+                $utc_cron_time = (new NewsLetterPluginAssistant())->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
+                $time = strtotime('next '.$assistant->days[$post[$config->post_meta_week_day]].' 01:00:00',strtotime($utc_cron_time));
+
+                if (date("Y-m-d",$time) >= date("Y-m-d")) {
+                    if (!wp_next_scheduled($hook_name, $args)) {
+                        wp_schedule_single_event($time, $hook_name, $args);
                     }
                 }
-
-                else if ($post[$config->post_meta_sending_frequency] == "weekly" and !$post[$config->post_meta_cron]){
-                    $hook_name = "weekly_newsletter_cron_job_of_".$post_id;
-                    $args = array($post_id);
-                    add_action($hook_name,[$this,"set_cron_job"],10,$args);
-
-                    $utc_cron_time = (new NewsLetterPluginAssistant())->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
-                    $time = strtotime('next '.$assistant->days[$post[$config->post_meta_week_day]].' 01:00:00',strtotime($utc_cron_time));
-
-                    if (date("Y-m-d",$time) >= date("Y-m-d")) {
-                        if (!wp_next_scheduled($hook_name, $args)) {
-                            wp_schedule_single_event($time, $hook_name, $args);
-                        }
-                    }
-                    else{
-                        $cron_time = $assistant->current_time_stamp();
-                        (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,$cron_time);
-
-                    }
-                }
-                else if ($post[$config->post_meta_sending_frequency] == "monthly" and !$post[$config->post_meta_cron]){
-                    $hook_name = "monthly_newsletter_cron_job_of_".$post_id;
-                    $args = array($post_id);
-                    add_action($hook_name,[$this,"set_cron_job"],10,$args);
-
-                    $utc_cron_time = (new NewsLetterPluginAssistant())->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
-                    $month_date = $assistant->text_date_time("Y-m-",$utc_cron_time).$post[$config->post_meta_month_date];
-                    $time = strtotime($month_date." 01:00:00");
-
-                    if ($month_date >= date("Y-m-d")){
-                        if ( ! wp_next_scheduled( $hook_name ,$args) ) {
-                            wp_schedule_single_event($time, $hook_name,$args);
-                        }
-                    }
-                    else{
-                        $cron_time = date("Y-m-d H:i:s",strtotime('+1 months',strtotime(date("Y-m-01 H:i:s"))));
-                        (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,$cron_time);
-
-                    }
-
+                else{
+                    $cron_time = $assistant->current_time_stamp();
+                    (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,$cron_time);
 
                 }
             }
-            else{
-                $hook_name = $post[$config->post_meta_sending_frequency]."_newsletter_cron_job_of_".$post_id;
-                wp_clear_scheduled_hook($hook_name,array($post_id));
+
+            else if ($post[$config->post_meta_sending_frequency] == "monthly" and !$post[$config->post_meta_cron]){
+                $hook_name = "monthly_newsletter_cron_job_of_".$post_id;
+                $args = array($post_id);
+                add_action($hook_name,[$this,"set_cron_job"],10,$args);
+
+                $utc_cron_time = (new NewsLetterPluginAssistant())->time_convert_by_zone($post[$config->post_meta_cron_time],"UTC",wp_timezone()->getName());
+                $month_date = $assistant->text_date_time("Y-m-",$utc_cron_time).$post[$config->post_meta_month_date];
+                $time = strtotime($month_date." 01:00:00");
+
+                if ($month_date >= date("Y-m-d")){
+                    if ( ! wp_next_scheduled( $hook_name ,$args) ) {
+                        wp_schedule_single_event($time, $hook_name,$args);
+                    }
+                }
+                else{
+                    $cron_time = date("Y-m-d H:i:s",strtotime('+1 months',strtotime(date("Y-m-01 H:i:s"))));
+                    (new NewsLetterPluginAssistant())->update_post_meta($post_id,(new NewsLetterPluginConfig())->post_meta_cron_time,$cron_time);
+
+                }
+
+
             }
+
 
         }
     }
@@ -211,12 +237,7 @@ class NewsLetterPluginCronJob
         ));
 
 
-
-        $assistant = new NewsLetterPluginAssistant();
-
         foreach ($posts as $post_object){
-
-            $post = $assistant->get_post_data($post_object->ID);
             $post_id = $post_object->ID;
 
             $freequency_type = get_post_meta($post_id,$config->post_meta_sending_frequency,true);
