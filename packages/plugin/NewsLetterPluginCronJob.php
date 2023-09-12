@@ -80,7 +80,9 @@ class NewsLetterPluginCronJob
 
 
                             $email = new \SendGrid\Mail\Mail();
-                            $email->setFrom($config->from_email, $config->from_email_name);
+                            // $email->setFrom($config->from_email, $config->from_email_name);
+                            
+                            $email->setFrom($post_data[$config->post_meta_from_email], $post_data[$config->post_meta_from_email_name]);
                             $email->setSubject($post_data[$config->post_meta_subject]);
                             $email->addTo($user->user_email, $user->display_name);
                             $email->addContent(
